@@ -2,10 +2,14 @@
 *.class
 *.lock
 *.log
+*.iml
 *.pyc
 *.swp
 .buildlog/
 .history
+fortetude.code-workspace
+.DS_Store
+Thumbs.db
 
 
 
