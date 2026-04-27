@@ -16,9 +16,10 @@ enum Direction {
 
 enum Category {
   vaults('V'),
-  conciousCompetence('CC'),
-  conciousIncompetece('CI'),
-  unconciousIncompetence('UI');
+  jumps('J'),
+  drops('D'),
+  wall('W'),
+  bar('B');
 
   final String short;
   const Category(this.short);
@@ -58,6 +59,7 @@ class Move {
   final int moveId;
   final String name;
   final Direction direction;
+  final Category category;
   Competency competency;
   int control;
   DateTime lastModified;
@@ -70,6 +72,7 @@ class Move {
     required this.moveId,
     required this.name,
     required this.direction,
+    required this.category,
     required this.competency,
     required this.control,
     DateTime? lastModified,
@@ -95,6 +98,7 @@ class Move {
       moveId: moveId,
       name: name,
       direction: direction,
+      category: category,
       competency: competency ?? this.competency,
       control: control ?? this.control,
     );
