@@ -17,6 +17,14 @@ class MovesScreen extends StatelessWidget {
             ListTile(
               title: Text(move.name),
               subtitle: Text(move.control.toString()),
+              tileColor: move.competency.color(),
+              trailing: Row (
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (IconData i in move.getIcons())
+                    Icon(i),
+                ]
+              ),
               onTap: () { showModalBottomSheet<void>(
                 context: build,
                 builder: (BuildContext context) {

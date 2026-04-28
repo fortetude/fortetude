@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 // Direction of the move
 enum Direction {
@@ -37,10 +37,10 @@ enum Competency {
 
   // switch color based on competency level
   Color color() => switch(this) {
-    Competency.unonciousCompetence => Color.fromARGB(255, 0, 0, 255),
-    Competency.conciousCompetence => Color.fromARGB(255, 0, 255, 0),
-    Competency.conciousIncompetece => Color.fromARGB(255, 255, 255, 0),
-    Competency.unconciousIncompetence => Color.fromARGB(255, 255, 0, 0),
+    Competency.unonciousCompetence => Color.fromARGB(200, 59, 167, 255),
+    Competency.conciousCompetence => Color.fromARGB(240, 100, 255, 86),
+    Competency.conciousIncompetece => Color.fromARGB(230, 255, 255, 114),
+    Competency.unconciousIncompetence => Color.fromARGB(209, 253, 80, 80),
   };
 }
 
@@ -76,8 +76,8 @@ class Move {
     required this.competency,
     required this.control,
     DateTime? lastModified,
-    Set<AreaOfConcern>? areas,
-    String? notes = '',
+    this.areas = const {},
+    this.notes = '',
   }) : lastModified = lastModified ?? DateTime.now();
 
   // string checks
@@ -86,6 +86,32 @@ class Move {
         ? value.substring(0, 1000)
         : value;
   }
+
+  List<IconData> getIcons() {
+    List<IconData> icons = [];
+
+    if(areas == null) {
+      print("$name is null");
+      return icons;
+    }
+
+    print("$name has AreaOfConcern $areas");
+
+    if (areas?.contains(AreaOfConcern.physical) ?? false) {
+      icons.add(Icons.fitness_center_rounded);
+    }
+
+    if (areas?.contains(AreaOfConcern.mental) ?? false) {
+      icons.add(Icons.self_improvement_rounded);
+    }
+
+    if (areas?.contains(AreaOfConcern.technique) ?? false) {
+      icons.add(Icons.psychology_rounded);
+    }
+
+    return icons;
+  }
+
 
   Move copyWith({
     Competency? competency,
