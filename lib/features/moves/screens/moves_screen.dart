@@ -16,19 +16,10 @@ class MovesScreen extends StatelessWidget {
           for (Move move in allMoves)
             Stack(
               children: [
-                Positioned.fill(child: Container(color: Colors.grey.shade200)),
-                Positioned.fill(
-                  child: FractionallySizedBox(
-                    alignment: Alignment.centerLeft,
-                    widthFactor: move.controlWidth(),
-                    child: Container(color: move.competency.color()),
-                  ),
-                ),
                 ListTile(
                   title: Text(move.name),
                   subtitle: Text(move.control.toString()),
-                  //tileColor: move.competency.color(),
-                  tileColor: Colors.transparent,
+                  tileColor: move.competency.color(),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -103,6 +94,21 @@ class MovesScreen extends StatelessWidget {
                       },
                     );
                   },
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  height: 4,
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: IgnorePointer(
+                      child: FractionallySizedBox(
+                        widthFactor: move.controlWidth(),
+                        child: Container(color: Color.lerp(move.competency.color(), Colors.black, 0.2)),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
