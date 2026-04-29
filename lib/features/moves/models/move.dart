@@ -87,31 +87,21 @@ class Move {
         : value;
   }
 
-  List<IconData> getIcons() {
-    List<IconData> icons = [];
-
-    if(areas == null) {
-      print("$name is null");
-      return icons;
-    }
-
-    print("$name has AreaOfConcern $areas");
-
-    if (areas?.contains(AreaOfConcern.physical) ?? false) {
-      icons.add(Icons.fitness_center_rounded);
-    }
-
-    if (areas?.contains(AreaOfConcern.mental) ?? false) {
-      icons.add(Icons.self_improvement_rounded);
-    }
-
-    if (areas?.contains(AreaOfConcern.technique) ?? false) {
-      icons.add(Icons.psychology_rounded);
-    }
-
-    return icons;
+  double controlWidth() {
+    return (control / 10).clamp(0.0, 1.0);
   }
 
+  bool hasPhysical() {
+    return areas?.contains(AreaOfConcern.physical) ?? false;
+  }
+
+  bool hasMental() {
+    return areas?.contains(AreaOfConcern.mental) ?? false;
+  }
+
+  bool hasTechnique() {
+    return areas?.contains(AreaOfConcern.technique) ?? false;
+  }
 
   Move copyWith({
     Competency? competency,

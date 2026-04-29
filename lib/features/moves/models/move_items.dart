@@ -14,7 +14,7 @@ final Set<AreaOfConcern> pmt = {AreaOfConcern.physical, AreaOfConcern.mental, Ar
 
 // Vaults
 final stepVaultL = Move(moveId: 0, name: "Step (L)", direction: Direction.left, areas: {AreaOfConcern.physical},
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 10);
 final stepVaultR = Move(moveId: 1, name: "Step (R)", direction: Direction.right, areas: monly,
                         category: Category.vaults, competency: Competency.conciousIncompetece, control: 2);
 final speedVaultL = Move(moveId: 2, name: "Speed (L)", direction: Direction.left, areas: tonly,
@@ -22,25 +22,25 @@ final speedVaultL = Move(moveId: 2, name: "Speed (L)", direction: Direction.left
 final speedVaultR = Move(moveId: 3, name: "Speed (R)", direction: Direction.right, areas: pm,
                         category: Category.vaults, competency: Competency.unonciousCompetence, control: 7);
 final kongVaultL = Move(moveId: 4, name: "Kong (L)", direction: Direction.left, areas: pt,
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 1);
 final kongVaultR = Move(moveId: 5, name: "Kong (R)", direction: Direction.right, areas: mt,
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 2);
 final diveKongVaultL = Move(moveId: 6, name: "Dive Kong", direction: Direction.both, areas: pmt,
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 3);
 final doubleKongVaultL = Move(moveId: 7, name: "Double Kong", direction: Direction.both, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
-final dashVaultL = Move(moveId: 8, name: "Dash (L)", direction: Direction.left, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 4);
+final dashVaultL = Move(moveId: 8, name: "Dash (L)", direction: Direction.left,
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 5);
 final dashVaultR = Move(moveId: 9, name: "Dash (R)", direction: Direction.right, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 6);
 final lazyVaultL = Move(moveId: 10, name: "Lazy (L)", direction: Direction.left, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 7);
 final lazyVaultR = Move(moveId: 11, name: "Lazy (R)", direction: Direction.right, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 8);
 final thiefVaultL = Move(moveId: 12, name: "Thief (L)", direction: Direction.left, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 9);
 final thiefVaultR = Move(moveId: 13, name: "Thief (R)", direction: Direction.right, 
-                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
+                        category: Category.vaults, competency: Competency.unconciousIncompetence, control: 10);
 final reverseVaultL = Move(moveId: 14, name: "Reverse (L)", direction: Direction.left, 
                         category: Category.vaults, competency: Competency.unconciousIncompetence, control: 0);
 final reverseVaultR = Move(moveId: 15, name: "Reverse (R)", direction: Direction.right, 
@@ -151,7 +151,6 @@ final Set<Move> allMoves = {
   speedVaultR,
   kongVaultL,
   kongVaultR,
-  /*
   diveKongVaultL,
   doubleKongVaultL,
   dashVaultL,
@@ -160,6 +159,7 @@ final Set<Move> allMoves = {
   lazyVaultR,
   thiefVaultL,
   thiefVaultR,
+  /*
   reverseVaultL,
   reverseVaultR,
   turnVaultL,
