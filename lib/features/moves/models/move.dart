@@ -87,6 +87,8 @@ class Move {
         : value;
   }
 
+  String getName() {return name;}
+
   double controlWidth() {
     return (control / 10).clamp(0.0, 1.0);
   }
