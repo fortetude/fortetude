@@ -3,6 +3,7 @@ import '../models/move.dart';
 import 'move_control_bar.dart';
 import 'move_areas_icons.dart';
 import 'move_add_sandbox_button.dart';
+import '../screens/move_detail_screen.dart';
 
 class MoveTile extends StatelessWidget {
   final Move move;
@@ -20,7 +21,7 @@ class MoveTile extends StatelessWidget {
           trailing: MoveAreasIcons(move: move),
 
           // MoveDetails
-          onTap: () => _openBottomSheet(context),
+          onTap: () => _openBottomSheet(context, move),
         ),
 
         MoveControlBar(move: move),
@@ -28,11 +29,23 @@ class MoveTile extends StatelessWidget {
     );
   }
 
-// MoveDetails
-  void _openBottomSheet(BuildContext context) {
-    showModalBottomSheet<void>(
+  // MoveDetails
+   Future<void> _openBottomSheet(BuildContext context, Move move) async {
+    final result = await showModalBottomSheet<bool>(
       context: context,
-      builder: (_) => Container(),
+      builder: (context) {
+        return MoveDetailScreen(move: move);
+      },
     );
+
+    if (result == true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Move saved successfully.'),
+          duration: Duration(seconds: 1),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 }

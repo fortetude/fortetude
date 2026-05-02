@@ -29,7 +29,7 @@ enum Category {
 enum Competency {
   unonciousCompetence('UC'),
   conciousCompetence('CC'),
-  conciousIncompetece('CI'),
+  conciousIncompetence('CI'),
   unconciousIncompetence('UI');
 
   final String short;
@@ -39,8 +39,16 @@ enum Competency {
   Color color() => switch(this) {
     Competency.unonciousCompetence => Color.fromARGB(200, 59, 167, 255),
     Competency.conciousCompetence => Color.fromARGB(240, 100, 255, 86),
-    Competency.conciousIncompetece => Color.fromARGB(230, 255, 255, 114),
+    Competency.conciousIncompetence => Color.fromARGB(230, 255, 255, 114),
     Competency.unconciousIncompetence => Color.fromARGB(209, 253, 80, 80),
+  };
+
+  @override
+  String toString() => switch(this) {
+    Competency.unonciousCompetence => "Unconcious Competence",
+    Competency.conciousCompetence => "Concious Competence",
+    Competency.conciousIncompetence => "Concious Incompetence",
+    Competency.unconciousIncompetence => "Unconcious Incompetence",
   };
 }
 
