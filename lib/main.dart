@@ -63,7 +63,8 @@ class FortetudeApp extends StatefulWidget {
 
 class _FortetudeAppState extends State<FortetudeApp> {
   int currentIndex = 1;
-  
+  var query = '';
+
   PreferredSizeWidget _buildAppBar(int currentIndex) {
     switch (currentIndex) {
       case 0: // MOVES
@@ -120,7 +121,6 @@ class _FortetudeAppState extends State<FortetudeApp> {
 
   @override
   Widget build(BuildContext context) {
-    
     return MaterialApp(
       theme: ThemeData(useMaterial3: true),
       home: Scaffold(
