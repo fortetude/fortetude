@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 //import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -33,19 +33,6 @@ void main() async {
     }
   }
 
-  // debug
-  for (var key in moveBox.keys) {
-    // Access the Move object by its key
-    Move? move = moveBox.get(key);
-    if (move == null) {
-      print("null move detected!");
-      return null;
-    }
-    // Print the details of the Move object
-    print(
-      'ID: ${move.moveId},Name: ${move.name}, Direction: ${move.direction}, Category: ${move.category}, Areas: ${move.areas}, Competency: ${move.competency}, Control: ${move.control}, Fresh: ${move.fresh}',
-    );
-  }
   // load dummy Lines
 
   // load dummy sandbox
@@ -55,6 +42,7 @@ void main() async {
 
 class FortetudeApp extends StatefulWidget {
   final Box<Move> moveBox;
+
   const FortetudeApp({super.key, required this.moveBox});
 
   @override
@@ -63,6 +51,7 @@ class FortetudeApp extends StatefulWidget {
 
 class _FortetudeAppState extends State<FortetudeApp> {
   int currentIndex = 1;
+  Set<Category> filters = {};
   var query = '';
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
@@ -105,13 +94,22 @@ class _FortetudeAppState extends State<FortetudeApp> {
             ),
           ],
         );
-      default: // catch
+      default: // catch_
         return AppBar();
     }
   }
 
   Widget? _buildDrawer() {
     switch (currentIndex) {
+      case 0:
+        return MovesDrawer(
+          filters: filters,
+          onChanged: (updatedFilters) {
+            setState(() {
+              filters = updatedFilters;
+            });
+          },
+        );
       case 1:
         return const SandboxDrawer();
       default:
@@ -127,7 +125,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
         appBar: _buildAppBar(currentIndex),
         drawer: _buildDrawer(),
         body: <Widget>[
-          MovesScreen(moveBox: widget.moveBox),
+          MovesScreen(moveBox: widget.moveBox, filters: filters),
           SandboxScreen(),
           LineScreen(),
         ][currentIndex],
