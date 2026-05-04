@@ -1,15 +1,61 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+//import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'navbar.dart';
+import 'features/moves/models/move.dart';
+import 'features/moves/models/move_items.dart';
+import 'features/moves/services/move_adapter.dart';
 import 'features/moves/screens/moves_screen.dart';
 import 'features/lines/screens/lines_screen.dart';
 import 'features/sandbox/screens/sandbox_screen.dart';
 
-void main() {
-  runApp(const FortetudeApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  //final dir = await getApplicationDocumentsDirectory();
+  //Hive.init(dir.absolute.path);
+  await Hive.initFlutter(); // for web
+
+  Hive.registerAdapter(MoveAdapter());
+
+  //init Hive boxes
+  Box<Move> moveBox = await Hive.openBox<Move>('moves');
+
+  // TODO: add sandbox Hive
+
+  //conditionally add fresh data
+  if (moveBox.isEmpty) {
+    if (kDebugMode) {
+      await insertMovesDebug(moveBox);
+    } else {
+      await insertMovesProd(moveBox);
+    }
+  }
+
+  // debug
+  for (var key in moveBox.keys) {
+    // Access the Move object by its key
+    Move? move = moveBox.get(key);
+    if (move == null) {
+      print("null move detected!");
+      return null;
+    }
+    // Print the details of the Move object
+    print(
+      'ID: ${move.moveId},Name: ${move.name}, Direction: ${move.direction}, Category: ${move.category}, Areas: ${move.areas}, Competency: ${move.competency}, Control: ${move.control}, Fresh: ${move.fresh}',
+    );
+  }
+  // load dummy Lines
+
+  // load dummy sandbox
+
+  runApp(FortetudeApp(moveBox: moveBox));
 }
 
 class FortetudeApp extends StatefulWidget {
-  const FortetudeApp({super.key});
+  final Box<Move> moveBox;
+  const FortetudeApp({super.key, required this.moveBox});
 
   @override
   State<FortetudeApp> createState() => _FortetudeAppState();
@@ -17,7 +63,7 @@ class FortetudeApp extends StatefulWidget {
 
 class _FortetudeAppState extends State<FortetudeApp> {
   int currentIndex = 1;
-
+  
   PreferredSizeWidget _buildAppBar(int currentIndex) {
     switch (currentIndex) {
       case 0: // MOVES
@@ -74,13 +120,14 @@ class _FortetudeAppState extends State<FortetudeApp> {
 
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
       theme: ThemeData(useMaterial3: true),
       home: Scaffold(
         appBar: _buildAppBar(currentIndex),
         drawer: _buildDrawer(),
         body: <Widget>[
-          MovesScreen(),
+          MovesScreen(moveBox: widget.moveBox),
           SandboxScreen(),
           LineScreen(),
         ][currentIndex],

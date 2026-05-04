@@ -16,7 +16,7 @@ class MoveTile extends StatelessWidget {
       children: [
         ListTile(
           title: Text(move.name),
-          tileColor: move.competency.color(),
+          tileColor: move.fresh? Colors.white : move.competency.color(),
           leading: MoveAddToSandboxButton(move: move),
           trailing: MoveAreasIcons(move: move),
 

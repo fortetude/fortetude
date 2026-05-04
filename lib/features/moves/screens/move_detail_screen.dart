@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../models/move.dart';
 import 'dart:math' as math;
 
@@ -13,7 +14,7 @@ class MoveDetailScreen extends StatefulWidget {
 
 class _MoveDetailScreenState extends State<MoveDetailScreen> {
   Competency? competency;
-  Set<AreaOfConcern>? area = {};
+  Set<AreaOfConcern> area = {};
   int controlRating = 0;
 
   @override
@@ -21,7 +22,7 @@ class _MoveDetailScreenState extends State<MoveDetailScreen> {
     super.initState();
     competency = widget.move.competency;
     controlRating = widget.move.control;
-    area = widget.move.areas ?? {};
+    area = widget.move.areas;
   }
 
   @override
@@ -67,7 +68,15 @@ class _MoveDetailScreenState extends State<MoveDetailScreen> {
           icon: const Icon(Icons.save),
           tooltip: "Save changes to this move",
           onPressed: () {
-            /* save changes to item */
+            
+            // save changes to item 
+            final moveBox = Hive.box<Move>('moves');
+            Move updatedMove = widget.move.copyWith(
+              areas: area,
+              control: controlRating,
+              competency: competency,
+              );
+            moveBox.put(widget.move.moveId, updatedMove);
 
             // Close bottom sheet
             Navigator.pop(context, true);
@@ -172,7 +181,7 @@ class _MoveDetailScreenState extends State<MoveDetailScreen> {
               label: Text('Tech', softWrap: false, overflow: TextOverflow.fade),
             ),
           ],
-          selected: area ?? {},
+          selected: area,
           multiSelectionEnabled: true,
           emptySelectionAllowed: true,
           onSelectionChanged: (newSelection) {

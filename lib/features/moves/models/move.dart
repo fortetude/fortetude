@@ -68,13 +68,13 @@ class Move {
   final String name;
   final Direction direction;
   final Category category;
+  bool fresh;
   Competency competency;
   int control;
   DateTime lastModified;
-  Set<AreaOfConcern>? areas; // can be null if none currently match
+  Set<AreaOfConcern> areas; // can be null if none currently match
   String? notes; // can be null if user doesn't require notes
   
-
   // Constructor for returning a new Move
   Move({
     required this.moveId,
@@ -84,9 +84,11 @@ class Move {
     required this.competency,
     required this.control,
     DateTime? lastModified,
-    this.areas = const {},
+    required this.areas,
+    fresh = false,
     this.notes = '',
-  }) : lastModified = lastModified ?? DateTime.now();
+  // ignore: prefer_initializing_formals
+  }) : lastModified = lastModified ?? DateTime.now(), fresh = fresh;
 
   // string checks
   static String truncateNotes(String value) {
@@ -102,22 +104,22 @@ class Move {
   }
 
   bool hasPhysical() {
-    return areas?.contains(AreaOfConcern.physical) ?? false;
+    return areas.contains(AreaOfConcern.physical);
   }
 
   bool hasMental() {
-    return areas?.contains(AreaOfConcern.mental) ?? false;
+    return areas.contains(AreaOfConcern.mental);
   }
 
   bool hasTechnique() {
-    return areas?.contains(AreaOfConcern.technique) ?? false;
+    return areas.contains(AreaOfConcern.technique);
   }
 
   Move copyWith({
     Competency? competency,
     int? control,
     DateTime? lastModified,
-    Set<AreaOfConcern>? areas, // can be null if none currently match
+    required Set<AreaOfConcern> areas, // can be null if none currently match
     String? notes // can be null if user doesn't require notes
   }) {
     return Move(
@@ -127,6 +129,8 @@ class Move {
       category: category,
       competency: competency ?? this.competency,
       control: control ?? this.control,
+      fresh: false,
+      areas: areas,
     );
   }
 }
