@@ -25,7 +25,6 @@ enum Category {
   const Category(this.short);
 }
 
-
 enum Competency {
   unonciousCompetence('UC'),
   conciousCompetence('CC'),
@@ -36,7 +35,7 @@ enum Competency {
   const Competency(this.short);
 
   // switch color based on competency level
-  Color color() => switch(this) {
+  Color color() => switch (this) {
     Competency.unonciousCompetence => Color.fromARGB(200, 59, 167, 255),
     Competency.conciousCompetence => Color.fromARGB(240, 100, 255, 86),
     Competency.conciousIncompetence => Color.fromARGB(230, 255, 255, 114),
@@ -44,7 +43,7 @@ enum Competency {
   };
 
   @override
-  String toString() => switch(this) {
+  String toString() => switch (this) {
     Competency.unonciousCompetence => "Unconcious Competence",
     Competency.conciousCompetence => "Concious Competence",
     Competency.conciousIncompetence => "Concious Incompetence",
@@ -60,7 +59,7 @@ enum AreaOfConcern {
   final String short;
   const AreaOfConcern(this.short);
 
-  IconData getIcon() => switch(this) {
+  IconData getIcon() => switch (this) {
     AreaOfConcern.physical => Icons.fitness_center_rounded,
     AreaOfConcern.mental => Icons.self_improvement_rounded,
     AreaOfConcern.technique => Icons.psychology_rounded,
@@ -70,17 +69,45 @@ enum AreaOfConcern {
 extension AreasIcon on AreaOfConcern {
   IconData get icon {
     switch (this) {
-      case AreaOfConcern.physical: return Icons.fitness_center_rounded;
-      case AreaOfConcern.mental: return Icons.self_improvement_rounded;
-      case AreaOfConcern.technique: return Icons.psychology_rounded;
+      case AreaOfConcern.physical:
+        return Icons.fitness_center_rounded;
+      case AreaOfConcern.mental:
+        return Icons.self_improvement_rounded;
+      case AreaOfConcern.technique:
+        return Icons.psychology_rounded;
+    }
+  }
+}
 
+enum MoveSortType {
+  defaultSort,
+  nameAsc,
+  nameDesc,
+  overallRatingAsc,
+  overallRatingDesc,
+}
+
+extension MoveSorting on MoveSortType {
+  int compare(Move a, Move b) {
+    switch (this) {
+      case MoveSortType.nameAsc:
+        return a.name.compareTo(b.name);
+
+      case MoveSortType.nameDesc:
+        return b.name.compareTo(a.name);
+
+      case MoveSortType.defaultSort:
+        return 0; // default case
+      case MoveSortType.overallRatingAsc:
+        return 0;
+      case MoveSortType.overallRatingDesc:
+        return 0;
     }
   }
 }
 
 // JSON representation of a "move"
 class Move {
-
   final int moveId;
   final String name;
   final Direction direction;
@@ -91,7 +118,7 @@ class Move {
   DateTime lastModified;
   Set<AreaOfConcern> areas; // can be null if none currently match
   String? notes; // can be null if user doesn't require notes
-  
+
   // Constructor for returning a new Move
   Move({
     required this.moveId,
@@ -104,17 +131,18 @@ class Move {
     required this.areas,
     fresh = false,
     this.notes = '',
-  // ignore: prefer_initializing_formals
-  }) : lastModified = lastModified ?? DateTime.now(), fresh = fresh;
+    // ignore: prefer_initializing_formals
+  }) : lastModified = lastModified ?? DateTime.now(),
+       fresh = fresh;
 
   // string checks
   static String truncateNotes(String value) {
-    return value.length > 1000
-        ? value.substring(0, 1000)
-        : value;
+    return value.length > 1000 ? value.substring(0, 1000) : value;
   }
 
-  String getName() {return name;}
+  String getName() {
+    return name;
+  }
 
   double controlWidth() {
     return (control / 10).clamp(0.0, 1.0);
@@ -137,7 +165,7 @@ class Move {
     int? control,
     DateTime? lastModified,
     required Set<AreaOfConcern> areas, // can be null if none currently match
-    String? notes // can be null if user doesn't require notes
+    String? notes, // can be null if user doesn't require notes
   }) {
     return Move(
       moveId: moveId,

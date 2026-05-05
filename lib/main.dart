@@ -55,12 +55,15 @@ class _FortetudeAppState extends State<FortetudeApp> {
   Set<Category> categoryFilters = {};
   Set<Competency> competencyFilters = {};
   Set<AreaOfConcern> areaFilters = {};
+  MoveSortType sortType = MoveSortType.defaultSort;
   var query = '';
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
     switch (currentIndex) {
       case 0: // MOVES
-        String c = (categoryFilters.length == 1) ? ": ${capitalise(categoryFilters.first.name)}" : "";
+        String c = (categoryFilters.length == 1)
+            ? ": ${capitalise(categoryFilters.first.name)}"
+            : "";
         return AppBar(
           title: Align(
             alignment: Alignment.center,
@@ -114,6 +117,8 @@ class _FortetudeAppState extends State<FortetudeApp> {
           onCategoryChanged: (v) => setState(() => categoryFilters = v),
           onCompetencyChanged: (v) => setState(() => competencyFilters = v),
           onAreaChanged: (v) => setState(() => areaFilters = v),
+          sortType: sortType,
+          onSortChanged: (v) => setState(() => sortType = v),
         );
       case 1:
         return const SandboxDrawer();
@@ -135,6 +140,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             categoryFilters: categoryFilters,
             competencyFilters: competencyFilters,
             areaFilters: areaFilters,
+            sortType: sortType,
           ),
           SandboxScreen(),
           LineScreen(),

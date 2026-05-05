@@ -8,6 +8,7 @@ class MovesScreen extends StatefulWidget {
   final Set<Category> categoryFilters;
   final Set<Competency> competencyFilters;
   final Set<AreaOfConcern> areaFilters;
+  final MoveSortType sortType;
 
   const MovesScreen({
     super.key,
@@ -15,6 +16,7 @@ class MovesScreen extends StatefulWidget {
     required this.categoryFilters,
     required this.competencyFilters,
     required this.areaFilters,
+    required this.sortType,
   });
 
   @override
@@ -79,6 +81,8 @@ class _MovesScreenState extends State<MovesScreen> {
                     matchesArea;
               }).toList();
 
+              moves.sort(widget.sortType.compare);
+
               if (moves.isEmpty) {
                 return const Center(child: Text('No results!'));
               }
@@ -97,6 +101,21 @@ class _MovesScreenState extends State<MovesScreen> {
   }
 }
 
+String _getSortLabel(MoveSortType sort) {
+  switch (sort) {
+    case MoveSortType.nameAsc:
+      return "Name ↑";
+    case MoveSortType.nameDesc:
+      return "Name ↓";
+    case MoveSortType.defaultSort:
+      return "Category (Default)";
+    case MoveSortType.overallRatingAsc:
+      return "Overall ↑";
+    case MoveSortType.overallRatingDesc:
+      return "Overall ↓";
+  }
+}
+
 class MovesDrawer extends StatelessWidget {
   final Set<Category> categoryFilters;
   final Set<Competency> competencyFilters;
@@ -106,6 +125,9 @@ class MovesDrawer extends StatelessWidget {
   final ValueChanged<Set<Competency>> onCompetencyChanged;
   final ValueChanged<Set<AreaOfConcern>> onAreaChanged;
 
+  final ValueChanged<MoveSortType> onSortChanged;
+  final MoveSortType sortType;
+
   const MovesDrawer({
     super.key,
     required this.categoryFilters,
@@ -114,6 +136,8 @@ class MovesDrawer extends StatelessWidget {
     required this.onCategoryChanged,
     required this.onCompetencyChanged,
     required this.onAreaChanged,
+    required this.onSortChanged,
+    required this.sortType,
   });
 
   @override
@@ -202,7 +226,30 @@ class MovesDrawer extends StatelessWidget {
               }).toList(),
             ),
             const SizedBox(height: 12),
-            const Divider(),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Divider(),
+                const Padding(
+                  padding: EdgeInsets.all(0),
+                  child: Text("Sort By"),
+                ),
+                ...MoveSortType.values.map((sortOption) {
+                  return RadioListTile<MoveSortType>(
+                    value: sortOption,
+                    groupValue: sortType,
+                    dense: true, // makes the row more compact
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 6),
+                    title: Text(_getSortLabel(sortOption)),
+                    onChanged: (value) {
+                      if (value != null) {
+                        onSortChanged(value);
+                      }
+                    },
+                  );
+                }),
+              ],
+            ),
           ],
         ),
       ),
