@@ -51,7 +51,9 @@ class FortetudeApp extends StatefulWidget {
 
 class _FortetudeAppState extends State<FortetudeApp> {
   int currentIndex = 1;
-  Set<Category> filters = {};
+  Set<Category> categoryFilters = {};
+  Set<Competency> competencyFilters = {};
+  Set<AreaOfConcern> areaFilters = {};
   var query = '';
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
@@ -103,12 +105,13 @@ class _FortetudeAppState extends State<FortetudeApp> {
     switch (currentIndex) {
       case 0:
         return MovesDrawer(
-          filters: filters,
-          onChanged: (updatedFilters) {
-            setState(() {
-              filters = updatedFilters;
-            });
-          },
+          categoryFilters: categoryFilters,
+          competencyFilters: competencyFilters,
+          areaFilters: areaFilters,
+
+          onCategoryChanged: (v) => setState(() => categoryFilters = v),
+          onCompetencyChanged: (v) => setState(() => competencyFilters = v),
+          onAreaChanged: (v) => setState(() => areaFilters = v),
         );
       case 1:
         return const SandboxDrawer();
@@ -125,7 +128,12 @@ class _FortetudeAppState extends State<FortetudeApp> {
         appBar: _buildAppBar(currentIndex),
         drawer: _buildDrawer(),
         body: <Widget>[
-          MovesScreen(moveBox: widget.moveBox, filters: filters),
+          MovesScreen(
+            moveBox: widget.moveBox,
+            categoryFilters: categoryFilters,
+            competencyFilters: competencyFilters,
+            areaFilters: areaFilters,
+          ),
           SandboxScreen(),
           LineScreen(),
         ][currentIndex],
