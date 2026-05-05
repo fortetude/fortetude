@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'navbar.dart';
+import 'core/utils/string.dart';
 import 'features/moves/models/move.dart';
 import 'features/moves/models/move_items.dart';
 import 'features/moves/services/move_adapter.dart';
@@ -59,10 +60,11 @@ class _FortetudeAppState extends State<FortetudeApp> {
   PreferredSizeWidget _buildAppBar(int currentIndex) {
     switch (currentIndex) {
       case 0: // MOVES
+        String c = (categoryFilters.length == 1) ? ": ${capitalise(categoryFilters.first.name)}" : "";
         return AppBar(
           title: Align(
             alignment: Alignment.center,
-            child: Text('Moves Screen'),
+            child: Text('Moves Screen $c'),
           ),
         );
       case 1: // SANDBOX

@@ -59,6 +59,23 @@ enum AreaOfConcern {
 
   final String short;
   const AreaOfConcern(this.short);
+
+  IconData getIcon() => switch(this) {
+    AreaOfConcern.physical => Icons.fitness_center_rounded,
+    AreaOfConcern.mental => Icons.self_improvement_rounded,
+    AreaOfConcern.technique => Icons.psychology_rounded,
+  };
+}
+
+extension AreasIcon on AreaOfConcern {
+  IconData get icon {
+    switch (this) {
+      case AreaOfConcern.physical: return Icons.fitness_center_rounded;
+      case AreaOfConcern.mental: return Icons.self_improvement_rounded;
+      case AreaOfConcern.technique: return Icons.psychology_rounded;
+
+    }
+  }
 }
 
 // JSON representation of a "move"

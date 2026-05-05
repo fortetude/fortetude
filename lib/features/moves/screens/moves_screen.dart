@@ -120,64 +120,91 @@ class MovesDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
       surfaceTintColor: Colors.blue,
-      width: 200,
-      child: ListView(
-        children: [
-          //Category Filter + Label
-          Text("Filter by Category:"),
-          Wrap(
-            spacing: 5.0,
-            children: Category.values.map((Category category) {
-              return FilterChip(
-                label: Text(category.name),
-                selected: categoryFilters.contains(category),
-                onSelected: (bool selected) {
-                  final newFilters = {...categoryFilters};
-                  if (selected) {
-                    newFilters.add(category);
-                  } else {
-                    newFilters.remove(category);
-                  }
+      width: 240,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: [
+            //Category Filter + Label
+            Text("Filter by Category:"),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 5.0,
+              children: Category.values.map((Category category) {
+                return FilterChip(
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                  label: Text(category.name),
+                  selected: categoryFilters.contains(category),
+                  onSelected: (bool selected) {
+                    final newFilters = {...categoryFilters};
+                    if (selected) {
+                      newFilters.add(category);
+                    } else {
+                      newFilters.remove(category);
+                    }
 
-                  onCategoryChanged(newFilters);
-                },
-              );
-            }).toList(),
-          ),
-          // Competency Filter + label
-          Text("Filter by Competency:"),
-          Wrap(
-            spacing: 5.0,
-            children: Competency.values.map((c) {
-              return FilterChip(
-                label: Text(c.name),
-                selected: competencyFilters.contains(c),
-                onSelected: (selected) {
-                  final newSet = {...competencyFilters};
-                  selected ? newSet.add(c) : newSet.remove(c);
-                  onCompetencyChanged(newSet);
-                },
-              );
-            }).toList(),
-          ),
-
-          // Area of Concern Filter + label
-          Text("Filter by Area of Concern:"),
-          Wrap(
-            spacing: 5.0,
-            children: AreaOfConcern.values.map((a) {
-              return FilterChip(
-                label: Text(a.name),
-                selected: areaFilters.contains(a),
-                onSelected: (selected) {
-                  final newSet = {...areaFilters};
-                  selected ? newSet.add(a) : newSet.remove(a);
-                  onAreaChanged(newSet);
-                },
-              );
-            }).toList(),
-          ),
-        ],
+                    onCategoryChanged(newFilters);
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+            // Competency Filter + label
+            Text("Filter by Competency:"),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 5.0,
+              children: Competency.values.map((c) {
+                return FilterChip(
+                  //visualDensity: VisualDensity.compact,
+                  visualDensity: VisualDensity(horizontal: -1, vertical: -1),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                  showCheckmark: false,
+                  label: Text(c.toString()),
+                  selectedColor: c.color(),
+                  selected: competencyFilters.contains(c),
+                  onSelected: (selected) {
+                    final newSet = {...competencyFilters};
+                    selected ? newSet.add(c) : newSet.remove(c);
+                    onCompetencyChanged(newSet);
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+            // Area of Concern Filter + label
+            Text("Filter by Area of Concern:"),
+            SizedBox(height: 8),
+            Wrap(
+              spacing: 5.0,
+              children: AreaOfConcern.values.map((a) {
+                return FilterChip(
+                  avatar: Icon(a.icon),
+                  showCheckmark: false,
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 2),
+                  label: Text(a.short),
+                  selected: areaFilters.contains(a),
+                  onSelected: (selected) {
+                    final newSet = {...areaFilters};
+                    selected ? newSet.add(a) : newSet.remove(a);
+                    onAreaChanged(newSet);
+                  },
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: 12),
+            const Divider(),
+          ],
+        ),
       ),
     );
   }
