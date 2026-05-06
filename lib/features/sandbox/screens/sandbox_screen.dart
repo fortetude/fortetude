@@ -12,8 +12,17 @@ class SandboxScreen extends StatelessWidget {
   }
 }
 
-class SandboxDrawer extends StatelessWidget {
-  const SandboxDrawer({super.key});
+class SandBoxAutoDrawer extends StatelessWidget {
+  const SandBoxAutoDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(surfaceTintColor: Colors.blue, width: 240);
+  }
+}
+
+class SandboxInfoDrawer extends StatelessWidget {
+  const SandboxInfoDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -74,8 +83,8 @@ class SandboxDrawer extends StatelessWidget {
           // Donate!
           ListTile(
             leading: Icon(Icons.volunteer_activism_outlined),
-            title: Text("Say Thanks"),
-            subtitle: Text("Help keep the app on app stores"),
+            title: Text("Donate"),
+            subtitle: Text("Enjoyed the app? Show some love!"),
             onTap: () {
               final mode = kIsWeb
                   ? LaunchMode.platformDefault
@@ -87,13 +96,13 @@ class SandboxDrawer extends StatelessWidget {
           Divider(height: 0),
           // Light/Dark toggle
           ListTile(
-            leading: Icon(Icons.light_mode_outlined),
+            leading: Icon(Icons.light_mode_outlined), // settings_display
             title: Text("Toggle Light/Dark Mode"),
             subtitle: Text(
               "[Work In Progress]",
               style: TextStyle(color: Colors.red),
             ),
-            trailing: Icon(Icons.dark_mode_outlined),
+            trailing: Icon(Icons.dark_mode_outlined), // settings_display_rounded
             onTap: () {},
           ),
           Divider(height: 0),
