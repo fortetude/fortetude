@@ -70,7 +70,6 @@ Map<String, Category> moveEntries = {
 // Vaults
 List<Move> templateMoves({bool randomise = false}) {
   int moveId = -1;
-
   // Iterate through the map and create a list of Move objects
   List<Move> moves = moveEntries.entries.map((entry) {
     // Create a new Move object for each key-value pair

@@ -156,10 +156,12 @@ class _MoveDetailScreenState extends State<MoveDetailScreen> {
         _sectionHeader(Icons.troubleshoot_rounded, "Area(s) of Concern"),
         SizedBox(height: 8),
         SegmentedButton<AreaOfConcern>(
+          selectedIcon: Icon(Icons.warning_rounded),
           segments: const [
             ButtonSegment(
               value: AreaOfConcern.physical,
               icon: Icon(Icons.fitness_center_rounded),
+
               label: Text(
                 'Physical',
                 softWrap: false,
