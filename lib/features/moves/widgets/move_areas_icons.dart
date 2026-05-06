@@ -12,7 +12,9 @@ class MoveAreasIcons extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _iconBox(Icons.fitness_center_rounded, move.hasPhysical()),
+        SizedBox(width: 4),
         _iconBox(Icons.self_improvement_rounded, move.hasMental()),
+        SizedBox(width: 4),
         _iconBox(Icons.psychology_rounded, move.hasTechnique()),
       ],
     );
@@ -26,15 +28,16 @@ class MoveAreasIcons extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
+            border: Border.all(color: visible ? Colors.black : Colors.white),
             borderRadius: BorderRadius.circular(6),
           ),
           child: Visibility(
-            visible: visible,
+            //visible: visible,
+            visible: true,
             maintainSize: true,
             maintainState: true,
             maintainAnimation: true,
-            child: Icon(icon),
+            child: visible? Icon(icon) : Icon(Icons.check_sharp, color: Colors.white70),
           ),
         ),
       ),

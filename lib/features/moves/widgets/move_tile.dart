@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../models/move.dart';
 import 'move_control_bar.dart';
 import 'move_areas_icons.dart';
@@ -16,7 +17,7 @@ class MoveTile extends StatelessWidget {
       children: [
         ListTile(
           title: Text(move.name),
-          tileColor: move.fresh? Colors.white : move.competency.color(),
+          tileColor: (!kDebugMode && move.fresh) ? Colors.white : move.competency.color(),
           leading: MoveAddToSandboxButton(move: move),
           trailing: MoveAreasIcons(move: move),
 

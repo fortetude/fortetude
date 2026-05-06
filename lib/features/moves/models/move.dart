@@ -38,7 +38,7 @@ enum Competency {
   Color color() => switch (this) {
     Competency.unonciousCompetence => Color.fromARGB(200, 59, 167, 255),
     Competency.conciousCompetence => Color.fromARGB(240, 100, 255, 86),
-    Competency.conciousIncompetence => Color.fromARGB(230, 255, 255, 114),
+    Competency.conciousIncompetence => Color.fromRGBO(255, 255, 24, 0.902),
     Competency.unconciousIncompetence => Color.fromARGB(209, 253, 80, 80),
   };
 
@@ -97,11 +97,11 @@ extension MoveSorting on MoveSortType {
         return b.name.compareTo(a.name);
 
       case MoveSortType.defaultSort:
-        return 0; // default case
+        return a.category.index.compareTo(b.category.index);
       case MoveSortType.overallRatingAsc:
-        return 0;
+        return a.overallRating.compareTo(b.overallRating);
       case MoveSortType.overallRatingDesc:
-        return 0;
+        return b.overallRating.compareTo(a.overallRating);
     }
   }
 }
@@ -177,5 +177,30 @@ class Move {
       fresh: false,
       areas: areas,
     );
+  }
+}
+
+extension MoveRating on Move {
+  int get overallRating {
+    // Competency points
+    int competencyPoints = switch (competency) {
+      Competency.unonciousCompetence => 70,
+      Competency.conciousCompetence => 50,
+      Competency.conciousIncompetence => 30,
+      Competency.unconciousIncompetence => 10,
+    };
+
+    // Area of Concern points
+    int areaPoints = switch (areas.length) {
+      0 => 0,
+      1 => -3,
+      2 => -5,
+      _ => -7, 
+    };
+
+    // Control points (just add control directly)
+    int controlPoints = control; 
+
+    return competencyPoints + areaPoints + controlPoints;
   }
 }
