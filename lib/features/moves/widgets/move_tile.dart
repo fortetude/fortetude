@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../models/move.dart';
 import 'move_control_bar.dart';
 import 'move_areas_icons.dart';
@@ -8,9 +9,10 @@ import '../screens/move_detail_screen.dart';
 
 class MoveTile extends StatelessWidget {
   final Move move;
+  final Box<int> sandBox;
 
-  const MoveTile({super.key, required this.move});
-
+  const MoveTile({super.key, required this.move, required this.sandBox});
+  
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -18,7 +20,7 @@ class MoveTile extends StatelessWidget {
         ListTile(
           title: Text(move.name),
           tileColor: (!kDebugMode && move.fresh) ? Colors.white : move.competency.color(),
-          leading: MoveAddToSandboxButton(move: move),
+          leading: MoveAddToSandboxButton(move: move, sandBox: sandBox),
           trailing: MoveAreasIcons(move: move),
 
           // MoveDetails

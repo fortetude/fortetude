@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 // Direction of the move
 enum Direction {
@@ -107,7 +108,7 @@ extension MoveSorting on MoveSortType {
 }
 
 // JSON representation of a "move"
-class Move {
+class Move extends HiveObject {
   final int moveId;
   final String name;
   final Direction direction;
@@ -128,21 +129,19 @@ class Move {
     required this.competency,
     required this.control,
     DateTime? lastModified,
+    //DateTime? lastUsed, // DateTime.utc(1, 1, 1);
     required this.areas,
-    fresh = false,
+    this.fresh = false,
     this.notes = '',
     // ignore: prefer_initializing_formals
-  }) : lastModified = lastModified ?? DateTime.now(),
-       fresh = fresh;
+  }) : lastModified = lastModified ?? DateTime.now();
 
   // string checks
   static String truncateNotes(String value) {
     return value.length > 1000 ? value.substring(0, 1000) : value;
   }
 
-  String getName() {
-    return name;
-  }
+  String get cleanName => name.replaceFirst(" (L)", "").replaceFirst(" (R)", "");
 
   double controlWidth() {
     return (control / 10).clamp(0.0, 1.0);
@@ -176,6 +175,7 @@ class Move {
       control: control ?? this.control,
       fresh: false,
       areas: areas,
+      lastModified: DateTime.now(), // update modified date
     );
   }
 }

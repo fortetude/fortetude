@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 //import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'dart:math';
 
 import 'navbar.dart';
 import 'core/utils/string.dart';
+
 import 'features/moves/models/move.dart';
 import 'features/lines/models/line.dart';
 import 'features/moves/models/move_items.dart';
@@ -12,6 +14,7 @@ import 'features/moves/services/move_adapter.dart';
 import 'features/moves/screens/moves_screen.dart';
 import 'features/lines/screens/lines_screen.dart';
 import 'features/sandbox/screens/sandbox_screen.dart';
+import 'features/sandbox/widgets/confirm_dialog.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,9 +26,8 @@ void main() async {
 
   //init Hive boxes
   Box<Move> moveBox = await Hive.openBox<Move>('moves');
-
-  // TODO: add sandbox Hive
-  Box<Line> sandBox = await Hive.openBox<Line>('sandbox');
+  Box<Line> lineBox = await Hive.openBox<Line>('lines');
+  Box<int> sandBox = await Hive.openBox<int>('sandbox');
 
   //conditionally add fresh data
   if (moveBox.isEmpty) {
@@ -36,17 +38,20 @@ void main() async {
     }
   }
 
-  // load dummy Lines
-
-  // load dummy sandbox
-
-  runApp(FortetudeApp(moveBox: moveBox));
+  runApp(FortetudeApp(moveBox: moveBox, lineBox: lineBox, sandBox: sandBox));
 }
 
 class FortetudeApp extends StatefulWidget {
   final Box<Move> moveBox;
+  final Box<Line> lineBox;
+  final Box<int> sandBox;
 
-  const FortetudeApp({super.key, required this.moveBox});
+  const FortetudeApp({
+    super.key,
+    required this.moveBox,
+    required this.lineBox,
+    required this.sandBox,
+  });
 
   @override
   State<FortetudeApp> createState() => _FortetudeAppState();
@@ -68,6 +73,15 @@ class _FortetudeAppState extends State<FortetudeApp> {
             : "";
         return AppBar(
           title: Align(alignment: Alignment.center, child: Text('Moves $c')),
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.filter_alt),
+              tooltip: "Filter & Sort",
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            ),
+          ),
         );
       case 1: // SANDBOX
         return AppBar(
@@ -83,10 +97,30 @@ class _FortetudeAppState extends State<FortetudeApp> {
             ),
           ),
           actions: [
-            _buildAction(Icons.add_rounded),
-            _buildAction(Icons.save),
-            _buildAction(Icons.folder_open),
-            _buildAction(Icons.more_vert),
+            _buildAction(
+              Icons.add_rounded,
+              widget.moveBox,
+              widget.lineBox,
+              widget.sandBox,
+            ),
+            _buildAction(
+              Icons.save,
+              widget.moveBox,
+              widget.lineBox,
+              widget.sandBox,
+            ),
+            _buildAction(
+              Icons.folder_open,
+              widget.moveBox,
+              widget.lineBox,
+              widget.sandBox,
+            ),
+            _buildAction(
+              Icons.more_vert,
+              widget.moveBox,
+              widget.lineBox,
+              widget.sandBox,
+            ),
           ],
           title: Align(alignment: Alignment.center, child: Text('Sandbox')),
         );
@@ -148,58 +182,88 @@ class _FortetudeAppState extends State<FortetudeApp> {
     }
   }
 
-  Widget _buildAction(IconData iconData) {
-    switch (iconData) {
-      case Icons.add_rounded:
-        return IconButton(
-          icon: Icon(Icons.add_rounded),
-          tooltip: "Add Move",
-          onPressed: () {},
-        );
-      case Icons.save:
-        return IconButton(
-          icon: Icon(Icons.save),
-          tooltip: "Save Line",
-          onPressed: () {},
-        );
-      case Icons.folder_open:
-        return IconButton(
-          icon: Icon(Icons.folder_open),
-          tooltip: "Open Saved Line",
-          onPressed: () {},
-        );
-      case Icons.more_vert:
-        return Builder(
-          builder:(context) => _popUpMenu(context)
-        );
-      case _:
-        return Placeholder();
-    }
+  Widget _buildAction(
+    IconData iconData,
+    Box<Move> moveBox,
+    Box<Line> lineBox,
+    Box<int> sandBox,
+  ) {
+    var builder = Builder(
+      builder: (context) {
+        var action = switch (iconData) {
+          Icons.add_rounded => IconButton(
+            icon: Icon(Icons.add_rounded),
+            tooltip: "Add Move",
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            onPressed: () {},
+          ),
+          Icons.save => IconButton(
+            icon: Icon(Icons.save),
+            tooltip: "Save Line",
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            onPressed: () {},
+          ),
+          Icons.folder_open => IconButton(
+            icon: Icon(Icons.folder_open),
+            tooltip: "Open Saved Line",
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            onPressed: () {},
+          ),
+          Icons.more_vert => _popUpMenu(moveBox, lineBox, sandBox, context),
+          _ => Placeholder(),
+        };
+
+        return action;
+      },
+    );
+
+    return builder;
   }
 
-  Widget _popUpMenu(BuildContext context) {
+  Widget _popUpMenu(
+    Box<Move> moveBox,
+    Box<Line> lineBox,
+    Box<int> sandBox,
+    BuildContext incomingContext,
+  ) {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_vert), // 3 dots
-      onSelected: (value) {
+      onSelected: (value) async {
         switch (value) {
           case 'shuffle':
-            print('Shuffle selected');
-            // Call your shuffle function here
+            if(sandBox.length < 2) {
+              String snackbarText = "Nothing to shuffle!";
+            } else {
+              await shuffleSandbox(widget.sandBox);
+              String snackbarText = "Sandbox shuffled!";
+            }
+            ScaffoldMessenger.of(incomingContext).showSnackBar(
+              SnackBar(
+                content: Text("Sandbox shuffled!"),
+                duration: Duration(seconds: 1),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
             break;
           case 'share':
             print('Share selected');
             // Call your share function here
             break;
-          case 'clear_sandbox':
-            print('Clear Sandbox selected');
-            // Call your clear sandbox function here
+          case 'clear':
+            if (await confirmEmptySandbox(context: incomingContext)) {
+              await sandBox.clear();
+            }
             break;
           case 'challenge':
-            print('Clear Sandbox selected');
+            print('Challenge selected');
             // Call your clear sandbox function here
             break;
           case 'info':
-            Scaffold.of(context).openEndDrawer();
+            print("info selected");
+            Scaffold.of(incomingContext).openEndDrawer();
             break;
         }
       },
@@ -258,6 +322,24 @@ class _FortetudeAppState extends State<FortetudeApp> {
     );
   }
 
+  Future<void> shuffleSandbox(Box<int> sandbox) async {
+    if (sandbox.isEmpty) return;
+
+    // Get current keys and values
+    final keys = sandbox.keys.toList();
+    final values = sandbox.values.toList();
+
+    // Shuffle the values
+    values.shuffle(Random());
+
+    // Map shuffled values back to original keys
+    final newMap = {for (int i = 0; i < keys.length; i++) keys[i]: values[i]};
+
+    // Clear and putAll to reorder Hive box
+    await sandbox.clear();
+    await sandbox.putAll(newMap);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -269,12 +351,17 @@ class _FortetudeAppState extends State<FortetudeApp> {
         body: <Widget>[
           MovesScreen(
             moveBox: widget.moveBox,
+            sandBox: widget.sandBox,
             categoryFilters: categoryFilters,
             competencyFilters: competencyFilters,
             areaFilters: areaFilters,
             sortType: sortType,
           ),
-          SandboxScreen(),
+          SandboxScreen(
+            moveBox: widget.moveBox,
+            lineBox: widget.lineBox,
+            sandBox: widget.sandBox,
+          ),
           LineScreen(),
         ][currentIndex],
         bottomNavigationBar: FTNavigationBar(

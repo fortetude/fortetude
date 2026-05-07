@@ -33,7 +33,7 @@ class MoveAdapter extends TypeAdapter<Move> {
     writer.writeByte(obj.competency.index);
     writer.writeInt(obj.control);
     writer.writeInt(obj.lastModified.millisecondsSinceEpoch);
-    writer.writeList(obj.areas?.map((e) => e.index).toList() ?? []);
+    writer.writeList(obj.areas.map((e) => e.index).toList());
     writer.writeBool(obj.fresh);
     writer.writeString(obj.notes ?? '');
   }

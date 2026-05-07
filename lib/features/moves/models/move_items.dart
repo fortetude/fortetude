@@ -70,6 +70,7 @@ Map<String, Category> moveEntries = {
 // Vaults
 List<Move> templateMoves({bool randomise = false}) {
   int moveId = -1;
+  Set<AreaOfConcern> all = {AreaOfConcern.physical, AreaOfConcern.mental, AreaOfConcern.technique};
   // Iterate through the map and create a list of Move objects
   List<Move> moves = moveEntries.entries.map((entry) {
     // Create a new Move object for each key-value pair
@@ -89,7 +90,7 @@ List<Move> templateMoves({bool randomise = false}) {
       direction: d,
       category: entry.value,
       competency: randomise ? randEnum(Competency.values) : Competency.unconciousIncompetence,
-      areas: randomise ? randAreas() : {},
+      areas: randomise ? randAreas() : all,
       fresh: true,
       control: randomise ? randControl() : 0,
     );

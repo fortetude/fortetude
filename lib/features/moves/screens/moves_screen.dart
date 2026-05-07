@@ -5,6 +5,7 @@ import '../widgets/move_tile.dart';
 
 class MovesScreen extends StatefulWidget {
   final Box<Move> moveBox;
+  final Box<int> sandBox;
   final Set<Category> categoryFilters;
   final Set<Competency> competencyFilters;
   final Set<AreaOfConcern> areaFilters;
@@ -13,6 +14,7 @@ class MovesScreen extends StatefulWidget {
   const MovesScreen({
     super.key,
     required this.moveBox,
+    required this.sandBox,
     required this.categoryFilters,
     required this.competencyFilters,
     required this.areaFilters,
@@ -90,7 +92,7 @@ class _MovesScreenState extends State<MovesScreen> {
               return ListView.builder(
                 itemCount: moves.length,
                 itemBuilder: (context, index) {
-                  return MoveTile(move: moves[index]);
+                  return MoveTile(move: moves[index], sandBox: widget.sandBox);
                 },
               );
             },

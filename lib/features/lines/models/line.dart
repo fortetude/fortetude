@@ -1,5 +1,7 @@
 
-class Line {
+import 'package:hive_flutter/hive_flutter.dart';
+
+class Line extends HiveObject {
   final int lineId;
   String name;
   List<int> moveList;
