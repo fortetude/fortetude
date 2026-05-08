@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:math';
 
+import 'core/utils/search.dart';
 import 'navbar.dart';
 import 'core/utils/string.dart';
 
@@ -196,7 +197,27 @@ class _FortetudeAppState extends State<FortetudeApp> {
             tooltip: "Add Move",
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
-            onPressed: () {},
+            onPressed: () async {
+              final moveId = await showSearch<int?>(
+                context: context,
+                delegate: MoveSearchDelegate(moveBox: widget.moveBox),
+              );
+
+              if (moveId != null) {
+                await widget.sandBox.add(moveId);
+                final name = widget.moveBox.get(moveId)!.name;
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added $name to Sandbox!'),
+                      duration: Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                      ),
+                  );
+                }
+              }
+            },
           ),
           Icons.save => IconButton(
             icon: Icon(Icons.save),
@@ -234,17 +255,17 @@ class _FortetudeAppState extends State<FortetudeApp> {
       onSelected: (value) async {
         switch (value) {
           case 'shuffle':
-            if(sandBox.length > 1) {
+            if (sandBox.length > 1) {
               await shuffleSandbox(widget.sandBox);
-            } 
+            }
 
             ScaffoldMessenger.of(incomingContext).showSnackBar(
               SnackBar(
                 content: Text(
-                  sandBox.length > 1 ? 
-                  "Sandbox shuffled!" : 
-                  "Nothing to shuffle!"
-                  ),
+                  sandBox.length > 1
+                      ? "Sandbox shuffled!"
+                      : "Nothing to shuffle!",
+                ),
                 duration: Duration(seconds: 1),
                 behavior: SnackBarBehavior.floating,
               ),
@@ -260,7 +281,10 @@ class _FortetudeAppState extends State<FortetudeApp> {
             }
             break;
           case 'challenge':
-            showModalBottomSheet(context: incomingContext, builder: _challengeSheet);
+            showModalBottomSheet(
+              context: incomingContext,
+              builder: _challengeSheet,
+            );
             break;
           case 'info':
             print("info selected");
@@ -323,64 +347,58 @@ class _FortetudeAppState extends State<FortetudeApp> {
     );
   }
 
-// show challenge tips
-Widget _challengeSheet(BuildContext context) {
-  return Container(
-    padding: const EdgeInsets.all(16),
-    decoration: BoxDecoration(
-      color: Theme.of(context).canvasColor,
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min, // shrink to fit content
-      children: [
-        // Header with flag emoji
-        Row(
-          children: const [
-            Text(
-              "Challenge Ideas ",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+  // show challenge tips
+  Widget _challengeSheet(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).canvasColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // shrink to fit content
+        children: [
+          // Header with flag emoji
+          Row(
+            children: const [
+              Text(
+                "Challenge Ideas ",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-            ),
-            Icon(Icons.flag),
-          ],
-        ),
-        const SizedBox(height: 12),
-
-        // Bullet points
-        _buildBullet("Do the line backwards from finish to start."),
-        _buildBullet("Swap the sides of some or all of the moves."),
-        _buildBullet("Time yourself and try to beat your previous record."),
-        _buildBullet("Take no more than two steps between each move."),
-        _buildBullet("Do the line together with a friend leading or following you."),
-
-        const SizedBox(height: 12),
-      ],
-    ),
-  );
-}
-
-// Bullet builder
-Widget _buildBullet(String text) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("• ", style: TextStyle(fontSize: 20)),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(fontSize: 16),
+              Icon(Icons.flag),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
-}
+          const SizedBox(height: 12),
+
+          // Bullet points
+          _buildBullet("Do the line backwards from finish to start."),
+          _buildBullet("Swap the sides of some or all of the moves."),
+          _buildBullet("Time yourself and try to beat your previous record."),
+          _buildBullet("Take no more than two steps between each move."),
+          _buildBullet(
+            "Do the line together with a friend leading or following you.",
+          ),
+
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
+  // Bullet builder
+  Widget _buildBullet(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("• ", style: TextStyle(fontSize: 20)),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 16))),
+        ],
+      ),
+    );
+  }
 
   Future<void> shuffleSandbox(Box<int> sandbox) async {
     if (sandbox.isEmpty) return;
