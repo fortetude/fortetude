@@ -14,7 +14,7 @@ class FTNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return NavigationBar(
       selectedIndex: currentIndex,
-      indicatorColor: Colors.lightBlue,
+      //indicatorColor: Colors.lightBlue,
       destinations: const <Widget>[
         //Moves
         NavigationDestination(

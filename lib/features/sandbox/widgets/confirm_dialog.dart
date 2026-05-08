@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future<bool> confirmEmptySandbox({required BuildContext context}) async {
+Future<bool> confirmEmptySandbox({required BuildContext context, required int length}) async {
 
   final result = await showDialog<bool>(
     context: context,
@@ -12,7 +12,7 @@ Future<bool> confirmEmptySandbox({required BuildContext context}) async {
           Expanded(child: const Text("Clearing Sandbox")),
         ]
       ),
-      content: const Text("This action will remove all contents of the sandbox. Proceed?"),
+      content: Text("This action will remove all contents ($length items) of the sandbox. Proceed?"),
       actions: [
 
         TextButton(

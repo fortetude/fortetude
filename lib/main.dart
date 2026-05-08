@@ -1,10 +1,12 @@
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
+import 'package:fortetude/features/lines/models/line_adapter.dart';
 //import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:math';
 
 import 'core/utils/search.dart';
+import 'features/lines/widgets/line_name.dart';
 import 'navbar.dart';
 import 'core/utils/string.dart';
 
@@ -24,6 +26,7 @@ void main() async {
   await Hive.initFlutter(); // for web
 
   Hive.registerAdapter(MoveAdapter());
+  Hive.registerAdapter(LineAdapter());
 
   //init Hive boxes
   Box<Move> moveBox = await Hive.openBox<Move>('moves');
@@ -213,7 +216,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
                       content: Text('Added $name to Sandbox!'),
                       duration: Duration(seconds: 1),
                       behavior: SnackBarBehavior.floating,
-                      ),
+                    ),
                   );
                 }
               }
@@ -224,7 +227,17 @@ class _FortetudeAppState extends State<FortetudeApp> {
             tooltip: "Save Line",
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
-            onPressed: () {},
+            onPressed: () async {
+              // prompt for name
+              final name = await promptLineName(context, widget.lineBox);
+              if (name != null) {
+                Line newLine = Line(
+                  name: name,
+                  moveList: sandBox.values.toList(),
+                );
+                await widget.lineBox.add(newLine);
+              }
+            },
           ),
           Icons.folder_open => IconButton(
             icon: Icon(Icons.folder_open),
@@ -276,7 +289,10 @@ class _FortetudeAppState extends State<FortetudeApp> {
             // Call your share function here
             break;
           case 'clear':
-            if (await confirmEmptySandbox(context: incomingContext)) {
+            if (await confirmEmptySandbox(
+              context: incomingContext,
+              length: sandBox.length,
+            )) {
               await sandBox.clear();
             }
             break;
@@ -287,7 +303,6 @@ class _FortetudeAppState extends State<FortetudeApp> {
             );
             break;
           case 'info':
-            print("info selected");
             Scaffold.of(incomingContext).openEndDrawer();
             break;
         }
@@ -440,7 +455,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             lineBox: widget.lineBox,
             sandBox: widget.sandBox,
           ),
-          LineScreen(),
+          LineScreen(lineBox:  widget.lineBox,),
         ][currentIndex],
         bottomNavigationBar: FTNavigationBar(
           currentIndex: currentIndex,
