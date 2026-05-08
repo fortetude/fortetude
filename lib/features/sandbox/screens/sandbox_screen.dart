@@ -42,7 +42,7 @@ class _SandboxScreenState extends State<SandboxScreen> {
       builder: (context, Box<int> sandbox, _) {
         return ReorderableListView.builder(
           buildDefaultDragHandles: false,
-          
+
           itemCount: sandbox.length,
 
           onReorder: (oldIndex, newIndex) async {
@@ -83,7 +83,7 @@ class _SandboxScreenState extends State<SandboxScreen> {
               ),
               child: Container(
                 margin: const EdgeInsets.symmetric(
-                  vertical: 2,
+                  vertical: 0,
                   horizontal: 0,
                 ), // spacing between tiles
                 decoration: BoxDecoration(
@@ -111,7 +111,6 @@ class _SandboxScreenState extends State<SandboxScreen> {
                   ),
                 ),
               ),
-              onUpdate: (direction) {},
               confirmDismiss: (direction) async {
                 // delete sandbox item
                 if (direction == DismissDirection.endToStart) {
