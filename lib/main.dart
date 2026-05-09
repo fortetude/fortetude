@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
 import 'package:fortetude/features/lines/models/line_adapter.dart';
@@ -67,8 +69,11 @@ class _FortetudeAppState extends State<FortetudeApp> {
   Set<Competency> competencyFilters = {};
   Set<AreaOfConcern> areaFilters = {};
   MoveSortType sortType = MoveSortType.defaultSort;
+  LinesSortType lsortType = LinesSortType.defaultSort;
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  Line? _selectedLine; // currently selected line
+  Line? _selectedLine; // currently selected line via longpress
+  Line? _tappedLine; // currently selected line via tap
   var query = '';
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
@@ -138,25 +143,14 @@ class _FortetudeAppState extends State<FortetudeApp> {
             builder: (context) => PopupMenuButton(
               icon: Icon(Icons.filter_alt),
               tooltip: "Sort lines",
-              onSelected: (value) async {
-                switch (value) {
-                  case 'nameasc':
-                    null;
-                    break;
-                  case 'namedesc':
-                    null;
-                    break;
-                  case 'created':
-                    null;
-                    break;
-                  case 'modified':
-                    null;
-                    break;
-                }
+              onSelected: (value) {
+                setState(() {
+                  lsortType = value;
+                });
               },
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  value: 'nameasc',
+                  value: LinesSortType.nameAsc,
                   child: Row(
                     children: [
                       Icon(Icons.sort_by_alpha),
@@ -166,7 +160,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
                   ),
                 ),
                 PopupMenuItem(
-                  value: 'namedesc',
+                  value: LinesSortType.nameDesc,
                   child: Row(
                     children: [
                       Icon(Icons.sort_outlined),
@@ -175,8 +169,32 @@ class _FortetudeAppState extends State<FortetudeApp> {
                     ],
                   ),
                 ),
-                 PopupMenuItem(
-                  value: 'created',
+                PopupMenuItem(
+                  value: LinesSortType.lengthAsc,
+                  child: Row(
+                    children: [
+                      Icon(Icons.square_foot_sharp),
+
+                      SizedBox(width: 8),
+                      Text("Length ↑"),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: LinesSortType.lengthDesc,
+                  child: Row(
+                    children: [
+                      Transform.rotate(
+                        angle: math.pi,
+                        child: Icon(Icons.square_foot_sharp),
+                      ),
+                      SizedBox(width: 8),
+                      Text("Length ↓"),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: LinesSortType.created,
                   child: Row(
                     children: [
                       Icon(Icons.history_edu_rounded),
@@ -185,8 +203,8 @@ class _FortetudeAppState extends State<FortetudeApp> {
                     ],
                   ),
                 ),
-                 PopupMenuItem(
-                  value: 'modified',
+                PopupMenuItem(
+                  value: LinesSortType.modified,
                   child: Row(
                     children: [
                       Icon(Icons.access_time_outlined),
@@ -200,20 +218,17 @@ class _FortetudeAppState extends State<FortetudeApp> {
           ),
           title: Align(alignment: Alignment.center, child: Text('Lines')),
           actions: [
-            Builder(
-              builder: (context) {
-                return IconButton(
-                  icon: Icon(Icons.alarm),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Snackbar!"),
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  },
-                );
-              },
+            _buildAction(
+              Icons.drive_file_rename_outline_outlined,
+              widget.moveBox,
+              widget.lineBox,
+              widget.sandBox,
+            ),
+            _buildAction(
+              Icons.add_road_outlined,
+              widget.moveBox,
+              widget.lineBox,
+              widget.sandBox,
             ),
           ],
         );
@@ -297,7 +312,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               // prompt for name
-              final name = await promptLineName(context, widget.lineBox);
+              final name = await promptLineName(context, widget.lineBox, null);
               if (name != null) {
                 Line newLine = Line(
                   name: name,
@@ -321,9 +336,66 @@ class _FortetudeAppState extends State<FortetudeApp> {
             tooltip: "Open Saved Line",
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
-            onPressed: () {},
+            onPressed: () {
+              // showSearch
+
+              // show overwrite dialog
+
+              // append
+              // overwrite
+            },
           ),
           Icons.more_vert => _popUpMenu(moveBox, lineBox, sandBox, context),
+          Icons.drive_file_rename_outline_outlined => IconButton(
+            icon: Icon(Icons.drive_file_rename_outline_outlined),
+            tooltip: "Edit Line Name",
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            onPressed: () async {
+              if (_tappedLine == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("No line selected!"),
+                    duration: Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              } else {
+                // show confirmation dialog
+                String? result = await promptLineName(
+                  context,
+                  lineBox,
+                  _tappedLine!.key,
+                );
+                // send it
+                if (result != null) {
+                  _tappedLine!.name = result;
+                  _tappedLine!.save();
+                }
+              }
+            },
+          ),
+          Icons.add_road_outlined => IconButton(
+            icon: Icon(Icons.add_road_outlined),
+            tooltip: "Import Line to Sandbox",
+            padding: EdgeInsets.zero,
+            visualDensity: VisualDensity.compact,
+            onPressed: () {
+              if (_tappedLine == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("No line selected!"),
+                    duration: Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              } else {
+                // show confirmation dialog
+
+                // send it
+              }
+            },
+          ),
           _ => Placeholder(),
         };
 
@@ -542,6 +614,12 @@ class _FortetudeAppState extends State<FortetudeApp> {
               });
               _scaffoldKey.currentState?.openDrawer();
             },
+            onLineTapped: (line) {
+              setState(() {
+                _tappedLine = line;
+              });
+            },
+            lsortType: lsortType,
           ),
         ][currentIndex],
         bottomNavigationBar: FTNavigationBar(

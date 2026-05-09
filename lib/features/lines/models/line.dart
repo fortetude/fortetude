@@ -1,5 +1,42 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+
+enum LinesSortType {
+  defaultSort,
+  nameAsc,
+  nameDesc,
+  lengthAsc,
+  lengthDesc,
+  created,
+  modified,
+}
+
+extension LinesSorting on LinesSortType {
+  int compare(Line a, Line b) {
+
+    if (a.pinned && !b.pinned) return -1;
+    if (!a.pinned && b.pinned) return 1;
+
+    switch (this) {
+      case LinesSortType.defaultSort:
+        return 0; // nop
+      case LinesSortType.nameAsc:
+        return a.name.compareTo(b.name);
+      case LinesSortType.nameDesc:
+        return b.name.compareTo(a.name);
+      case LinesSortType.lengthAsc:
+        return a.length.compareTo(b.length);
+      case LinesSortType.lengthDesc:
+        return b.length.compareTo(a.length);
+      case LinesSortType.created:
+        return a.created.compareTo(b.created);
+      case LinesSortType.modified:
+        return a.modified!.compareTo(b.modified!);
+    }
+  }
+}
+
+
 class Line extends HiveObject {
   //final int lineId; // no need for this anymore since HiveObject has its key
   String name;

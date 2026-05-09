@@ -1,57 +1,83 @@
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import '../models/line.dart';
 
-Future<String?> promptLineName(BuildContext context, Box<Line> lineBox) async {
+Future<String?> promptLineName(
+  BuildContext context,
+  Box<Line> lineBox,
+  int? modifyId,
+) async {
   final controller = TextEditingController();
+
+  String? errorText;
 
   return showDialog<String>(
     context: context,
-
     builder: (context) {
-      return AlertDialog(
-        title: const Text("Save Line"),
+      return StatefulBuilder(
+        builder: (context, setState) {
+          controller.addListener(() {
+            if (errorText != null) {
+              setState(() => errorText = null);
+            }
+          });
 
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: "Enter line name...",
-            border: OutlineInputBorder(),
-          ),
-
-          onSubmitted: (value) {
+          void submit() {
+            if (modifyId != null) {
+              final currLine = lineBox.get(modifyId);
+              if (currLine == null) {
+                throw Error;
+              }
+              if (currLine.name == controller.text) {
+                Navigator.pop(context, null);
+              }
+            }
+            final trimmed = controller.text.trim();
             final duplicated = lineBox.values.any(
-              (line) => line.name == value,
+              (line) => line.name == trimmed,
             );
 
-            if(duplicated) {
-              value = "${value.trim()} (copy)";
+            if (duplicated || trimmed.isEmpty) {
+              // Update the error message and prevent closing
+              setState(() {
+                errorText = "Name already exists!";
+              });
+              return;
             }
-            Navigator.pop(context, value);
-          },
-        ),
 
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context, null);
-            },
-            child: const Text("Cancel"),
-          ),
+            // Valid name, close dialog
+            Navigator.pop(context, trimmed);
+          }
 
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(
-                context,
-                controller.text.trim(),
-              );
-            },
-            child: const Text("Save"),
-          ),
-        ],
+          return AlertDialog(
+            title: (modifyId != null)
+                ? Text("Edit Line Name")
+                : Text("Save Line"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: controller,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: "Enter line name...",
+                    border: const OutlineInputBorder(),
+                    errorText: errorText, // displays inline error
+                  ),
+                  onSubmitted: (_) => submit(),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, null),
+                child: const Text("Cancel"),
+              ),
+              FilledButton(onPressed: submit, child: const Text("Save")),
+            ],
+          );
+        },
       );
     },
   );

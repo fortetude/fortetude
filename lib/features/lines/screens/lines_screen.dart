@@ -8,11 +8,16 @@ class LineScreen extends StatefulWidget {
   final Box<Line> lineBox;
   final GlobalKey<ScaffoldState> scaffoldKey;
   final void Function(Line) onLineSelected;
+  final void Function(Line) onLineTapped;
+  final LinesSortType lsortType;
+
   const LineScreen({
     super.key,
     required this.lineBox,
     required this.scaffoldKey,
     required this.onLineSelected,
+    required this.onLineTapped,
+    required this.lsortType,
   });
 
   @override
@@ -70,6 +75,18 @@ class _LineScreenState extends State<LineScreen> {
                 return line.name.toLowerCase().contains(query);
               }).toList();
 
+              if (lines.isEmpty) {
+                return const Center(child: Text('No results!'));
+              }
+
+              // sort - accounting for pinned items
+              lines.sort(widget.lsortType.compare);
+
+              final firstNonPinnedIndex = lines.indexWhere(
+                (line) => line.pinned == false,
+              );
+              final lastPinnedIndex = firstNonPinnedIndex -1;
+
               return ListView.builder(
                 itemCount: lines.length,
                 itemBuilder: (context, index) {
@@ -122,20 +139,35 @@ class _LineScreenState extends State<LineScreen> {
 
                     child: Builder(
                       builder: (context) {
-                        return ListTile(
-                          title: Text(line.name, overflow: TextOverflow.fade),
-                          subtitle: Text("${line.length} moves"),
-                          selected: selectedIndex == index,
-                          selectedTileColor: Theme.of(context).focusColor,
-                          trailing: line.pinned ? Icon(Icons.push_pin) : null,
-                          onLongPress: () {
-                            widget.onLineSelected(line);
-                          },
-                          onTap: () {
-                            setState(() {
-                              selectedIndex = index;
-                            });
-                          },
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: (index == lastPinnedIndex)
+                                ? Border(
+                                    bottom: BorderSide(
+                                      color: Colors.black,
+                                      width: 1,
+                                    ),
+                                  )
+                                : null,
+                          ),
+                          child: ListTile(
+                            title: Text(line.name, overflow: TextOverflow.fade),
+                            subtitle: Text("${line.length} moves"),
+                            selected: selectedIndex == index,
+                            tileColor: line.pinned ? Colors.amber.shade50 : null,
+                            selectedColor: line.pinned? Colors.orange.shade600 : null,
+                            selectedTileColor: line.pinned ? Colors.amber.shade100 : Theme.of(context).focusColor,
+                            trailing: line.pinned ? Icon(Icons.push_pin) : null,
+                            onLongPress: () {
+                              widget.onLineSelected(line);
+                            },
+                            onTap: () {
+                              setState(() {
+                                selectedIndex = index;
+                                widget.onLineTapped(line);
+                              });
+                            },
+                          ),
                         );
                       },
                     ),
@@ -167,7 +199,7 @@ class LineDrawer extends StatelessWidget {
         .toList();
 
     return Drawer(
-      surfaceTintColor: Colors.blue,
+      surfaceTintColor: selectedLine!.pinned ? Colors.amberAccent : Colors.blue,
       width: 190,
       child: Padding(
         padding: const EdgeInsets.all(16),
