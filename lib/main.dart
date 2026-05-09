@@ -134,6 +134,70 @@ class _FortetudeAppState extends State<FortetudeApp> {
         return AppBar(
           automaticallyImplyLeading: false,
           automaticallyImplyActions: false,
+          leading: Builder(
+            builder: (context) => PopupMenuButton(
+              icon: Icon(Icons.filter_alt),
+              tooltip: "Sort lines",
+              onSelected: (value) async {
+                switch (value) {
+                  case 'nameasc':
+                    null;
+                    break;
+                  case 'namedesc':
+                    null;
+                    break;
+                  case 'created':
+                    null;
+                    break;
+                  case 'modified':
+                    null;
+                    break;
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'nameasc',
+                  child: Row(
+                    children: [
+                      Icon(Icons.sort_by_alpha),
+                      SizedBox(width: 8),
+                      Text("Name: A - Z"),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'namedesc',
+                  child: Row(
+                    children: [
+                      Icon(Icons.sort_outlined),
+                      SizedBox(width: 8),
+                      Text("Name: Z - A"),
+                    ],
+                  ),
+                ),
+                 PopupMenuItem(
+                  value: 'created',
+                  child: Row(
+                    children: [
+                      Icon(Icons.history_edu_rounded),
+                      SizedBox(width: 8),
+                      Text("Date Created"),
+                    ],
+                  ),
+                ),
+                 PopupMenuItem(
+                  value: 'modified',
+                  child: Row(
+                    children: [
+                      Icon(Icons.access_time_outlined),
+                      SizedBox(width: 8),
+                      Text("Last Modified"),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
           title: Align(alignment: Alignment.center, child: Text('Lines')),
           actions: [
             Builder(
@@ -476,8 +540,9 @@ class _FortetudeAppState extends State<FortetudeApp> {
               setState(() {
                 _selectedLine = line;
               });
-                _scaffoldKey.currentState?.openDrawer();
-            }),
+              _scaffoldKey.currentState?.openDrawer();
+            },
+          ),
         ][currentIndex],
         bottomNavigationBar: FTNavigationBar(
           currentIndex: currentIndex,

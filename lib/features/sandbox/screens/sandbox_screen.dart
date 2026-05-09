@@ -73,7 +73,7 @@ class _SandboxScreenState extends State<SandboxScreen> {
                 color: Colors.deepPurple,
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(Icons.signpost, color: Colors.white),
+                child: Icon(Icons.swap_horizontal_circle_sharp, color: Colors.white),
               ),
               secondaryBackground: Container(
                 color: Colors.red,

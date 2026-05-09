@@ -22,6 +22,8 @@ class LineScreen extends StatefulWidget {
 class _LineScreenState extends State<LineScreen> {
   late Box<Line> lineBox;
   int? selectedIndex;
+  String query = '';
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -31,83 +33,119 @@ class _LineScreenState extends State<LineScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: widget.lineBox.listenable(),
-      builder: (context, Box<Line> lineBox, _) {
-        final lines = lineBox.values.toList();
-        return ListView.builder(
-          itemCount: lines.length,
-          itemBuilder: (context, index) {
-            final line = lines[index];
-            final key = line.key; // HiveObject key
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SearchBar(
+            controller: _controller,
+            constraints: BoxConstraints(maxHeight: 60.0, maxWidth: 200.0),
+            leading: const Icon(Icons.search),
+            trailing: [
+              if (query.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    _controller.clear();
+                    setState(() {
+                      query = '';
+                    });
+                  },
+                ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                query = value.toLowerCase();
+              });
+            },
+          ),
+        ),
+        Expanded(
+          child: ValueListenableBuilder(
+            valueListenable: widget.lineBox.listenable(),
+            builder: (context, Box<Line> lineBox, _) {
+              //final lines = lineBox.values.toList();
 
-            return Dismissible(
-              key: ValueKey(key),
-              // show different icon and bg based on pinned
-              background: Container(
-                color: line.pinned ? Colors.grey : Colors.orange,
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: line.pinned
-                    ? Icon(Icons.backspace_rounded, color: Colors.white)
-                    : Icon(Icons.push_pin_rounded, color: Colors.white),
-              ),
-              secondaryBackground: Container(
-                color: Colors.red,
-                alignment: Alignment.centerRight,
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(Icons.delete, color: Colors.white),
-              ),
+              final lines = lineBox.values.where((line) {
+                return line.name.toLowerCase().contains(query);
+              }).toList();
 
-              // allow both directions
-              direction: DismissDirection.horizontal,
+              return ListView.builder(
+                itemCount: lines.length,
+                itemBuilder: (context, index) {
+                  final line = lines[index];
+                  final key = line.key; // HiveObject key
 
-              confirmDismiss: (direction) async {
-                // delete line
-                if (direction == DismissDirection.endToStart) {
-                  widget.lineBox.delete(key);
-                  return true;
-                }
+                  return Dismissible(
+                    key: ValueKey(key),
+                    // show different icon and bg based on pinned
+                    background: Container(
+                      color: line.pinned ? Colors.grey : Colors.orange,
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: line.pinned
+                          ? Icon(Icons.backspace_rounded, color: Colors.white)
+                          : Icon(Icons.push_pin_rounded, color: Colors.white),
+                    ),
+                    secondaryBackground: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerRight,
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
 
-                // toggle pinned value
-                if (direction == DismissDirection.startToEnd) {
-                  line.pinned = !line.pinned;
-                  line.save();
-                  return false;
-                }
+                    // allow both directions
+                    direction: DismissDirection.horizontal,
 
-                return false;
-              },
+                    confirmDismiss: (direction) async {
+                      // delete line
+                      if (direction == DismissDirection.endToStart) {
+                        widget.lineBox.delete(key);
+                        return true;
+                      }
 
-              onDismissed: (direction) {
-                if (direction == DismissDirection.endToStart) {
-                  line.delete();
-                }
-              },
+                      // toggle pinned value
+                      if (direction == DismissDirection.startToEnd) {
+                        line.pinned = !line.pinned;
+                        line.save();
+                        return false;
+                      }
 
-              child: Builder(
-                builder: (context) {
-                  return ListTile(
-                    title: Text(line.name, overflow: TextOverflow.fade),
-                    subtitle: Text("${line.length} moves"),
-                    selected: selectedIndex == index,
-                    selectedTileColor: Theme.of(context).focusColor,
-                    trailing: line.pinned ? Icon(Icons.push_pin) : null,
-                    onLongPress: () {
-                      widget.onLineSelected(line);
+                      return false;
                     },
-                    onTap: () {
-                      setState(() {
-                        selectedIndex = index;
-                      });
+
+                    onDismissed: (direction) {
+                      if (direction == DismissDirection.endToStart) {
+                        line.delete();
+                      }
                     },
+
+                    child: Builder(
+                      builder: (context) {
+                        return ListTile(
+                          title: Text(line.name, overflow: TextOverflow.fade),
+                          subtitle: Text("${line.length} moves"),
+                          selected: selectedIndex == index,
+                          selectedTileColor: Theme.of(context).focusColor,
+                          trailing: line.pinned ? Icon(Icons.push_pin) : null,
+                          onLongPress: () {
+                            widget.onLineSelected(line);
+                          },
+                          onTap: () {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                        );
+                      },
+                    ),
                   );
                 },
-              ),
-            );
-          },
-        );
-      },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -129,6 +167,7 @@ class LineDrawer extends StatelessWidget {
         .toList();
 
     return Drawer(
+      surfaceTintColor: Colors.blue,
       width: 190,
       child: Padding(
         padding: const EdgeInsets.all(16),
