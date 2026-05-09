@@ -13,6 +13,8 @@ enum Direction {
   bool isLeft() => this == Direction.left;
   bool isRight() => this == Direction.right;
   bool isBoth() => this == Direction.both;
+  bool notLeft() => this != Direction.left;
+  bool notRight() => this != Direction.right;
 }
 
 enum Category {

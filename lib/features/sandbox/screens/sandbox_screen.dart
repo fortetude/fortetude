@@ -87,10 +87,21 @@ class _SandboxScreenState extends State<SandboxScreen> {
                   horizontal: 0,
                 ), // spacing between tiles
                 decoration: BoxDecoration(
-                  color: moveItem.competency.color(), // keeps your tile color
-                  border: Border.all(
-                    color: Colors.black26, // subtle gray border
-                    width: 2, // slim border
+                  border: Border(
+                    top: BorderSide(color: Colors.black26, width: 1),
+                    bottom: BorderSide(color: Colors.black26, width: 1),
+                    left: BorderSide(
+                      color: moveItem.direction.notRight()
+                          ? moveItem.competency.color()
+                          : Colors.transparent,
+                      width: 5,
+                    ),
+                    right: BorderSide(
+                      color: moveItem.direction.notLeft()
+                          ? moveItem.competency.color()
+                          : Colors.transparent,
+                      width: 5,
+                    ),
                   ),
                 ),
                 child: ListTile(
@@ -99,12 +110,6 @@ class _SandboxScreenState extends State<SandboxScreen> {
                     alignment: align,
                     child: Text(moveItem.cleanName),
                   ),
-                  /*
-                  subtitle: Text(
-                    "ListIndex: $index | hiveKey: ${hiveKey.toString()} | moveId: ${itemMoveId.toString()}",
-                  ),
-                  */
-                  tileColor: moveItem.competency.color(),
                   trailing: ReorderableDragStartListener(
                     index: index,
                     child: Icon(Icons.drag_handle),

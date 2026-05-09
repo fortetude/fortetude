@@ -35,7 +35,6 @@ class LineAdapter extends TypeAdapter<Line> {
     writer.writeList(obj.moveList);
     writer.write(obj.created);
     writer.write(obj.modified);
-    writer.writeInt(obj.length);
     writer.writeBool(obj.pinned);
   }
 }

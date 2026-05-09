@@ -31,6 +31,7 @@ class MoveAddToSandboxButton extends StatelessWidget {
             content: Text("${move.name} added to Sandbox!"),
             duration: Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
+            persist: false,
             action: SnackBarAction(
               label: "Undo",
               onPressed: () {

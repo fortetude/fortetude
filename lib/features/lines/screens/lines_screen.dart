@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../../moves/models/move.dart';
 import '../models/line.dart';
 
 class LineScreen extends StatefulWidget {
   final Box<Line> lineBox;
-
-  const LineScreen({super.key, required this.lineBox});
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  final void Function(Line) onLineSelected;
+  const LineScreen({
+    super.key,
+    required this.lineBox,
+    required this.scaffoldKey,
+    required this.onLineSelected,
+  });
 
   @override
   State<LineScreen> createState() => _LineScreenState();
@@ -14,6 +21,7 @@ class LineScreen extends StatefulWidget {
 
 class _LineScreenState extends State<LineScreen> {
   late Box<Line> lineBox;
+  int? selectedIndex;
 
   @override
   void initState() {
@@ -27,7 +35,6 @@ class _LineScreenState extends State<LineScreen> {
       valueListenable: widget.lineBox.listenable(),
       builder: (context, Box<Line> lineBox, _) {
         final lines = lineBox.values.toList();
-
         return ListView.builder(
           itemCount: lines.length,
           itemBuilder: (context, index) {
@@ -36,11 +43,14 @@ class _LineScreenState extends State<LineScreen> {
 
             return Dismissible(
               key: ValueKey(key),
+              // show different icon and bg based on pinned
               background: Container(
-                color: Colors.orange,
+                color: line.pinned ? Colors.grey : Colors.orange,
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(Icons.push_pin_rounded, color: Colors.white),
+                child: line.pinned
+                    ? Icon(Icons.backspace_rounded, color: Colors.white)
+                    : Icon(Icons.push_pin_rounded, color: Colors.white),
               ),
               secondaryBackground: Container(
                 color: Colors.red,
@@ -53,16 +63,17 @@ class _LineScreenState extends State<LineScreen> {
               direction: DismissDirection.horizontal,
 
               confirmDismiss: (direction) async {
+                // delete line
                 if (direction == DismissDirection.endToStart) {
-                  // RIGHT → LEFT (delete)
-                  //return await _confirmDelete(context);
-                  return false;
+                  widget.lineBox.delete(key);
+                  return true;
                 }
 
+                // toggle pinned value
                 if (direction == DismissDirection.startToEnd) {
-                  // LEFT → RIGHT (pin toggle)
-                  //_togglePin(line);
-                  return false; // don't remove item from list
+                  line.pinned = !line.pinned;
+                  line.save();
+                  return false;
                 }
 
                 return false;
@@ -74,17 +85,55 @@ class _LineScreenState extends State<LineScreen> {
                 }
               },
 
-              child: ListTile(
-                title: Text(line.name),
-                subtitle: Text("${line.length} moves"),
-                trailing: Icon(
-                  line.pinned ? Icons.push_pin : Icons.push_pin_outlined,
-                ),
+              child: Builder(
+                builder: (context) {
+                  return ListTile(
+                    title: Text(line.name, overflow: TextOverflow.fade),
+                    subtitle: Text("${line.length} moves"),
+                    selected: selectedIndex == index,
+                    selectedTileColor: Theme.of(context).focusColor,
+                    trailing: line.pinned ? Icon(Icons.push_pin) : null,
+                    onLongPress: () {
+                      widget.onLineSelected(line);
+                    },
+                    onTap: () {
+                      setState(() {
+                        selectedIndex = index;
+                      });
+                    },
+                  );
+                },
               ),
             );
           },
         );
       },
+    );
+  }
+}
+
+class LineDrawer extends StatelessWidget {
+  final Line? selectedLine;
+  final Box<Move> moveBox;
+  const LineDrawer({
+    super.key,
+    required this.selectedLine,
+    required this.moveBox,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    // Map moveIds → move names
+    final moveNames = selectedLine!.moveList
+        .map((id) => moveBox.get(id)?.name ?? 'Unknown move')
+        .toList();
+
+    return Drawer(
+      width: 190,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(moveNames.join("\n"), style: TextStyle(fontSize: 16)),
+      ),
     );
   }
 }

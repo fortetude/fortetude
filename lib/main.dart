@@ -67,6 +67,8 @@ class _FortetudeAppState extends State<FortetudeApp> {
   Set<Competency> competencyFilters = {};
   Set<AreaOfConcern> areaFilters = {};
   MoveSortType sortType = MoveSortType.defaultSort;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  Line? _selectedLine; // currently selected line
   var query = '';
 
   PreferredSizeWidget _buildAppBar(int currentIndex) {
@@ -130,6 +132,8 @@ class _FortetudeAppState extends State<FortetudeApp> {
         );
       case 2: // LINES
         return AppBar(
+          automaticallyImplyLeading: false,
+          automaticallyImplyActions: false,
           title: Align(alignment: Alignment.center, child: Text('Lines')),
           actions: [
             Builder(
@@ -171,7 +175,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
       case 1:
         return SandBoxAutoDrawer();
       default:
-        return null; // no drawer for other tabs
+        return LineDrawer(selectedLine: _selectedLine, moveBox: widget.moveBox);
     }
   }
 
@@ -236,6 +240,15 @@ class _FortetudeAppState extends State<FortetudeApp> {
                   moveList: sandBox.values.toList(),
                 );
                 await widget.lineBox.add(newLine);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added "$name" to Saved Lines!'),
+                      duration: Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
               }
             },
           ),
@@ -441,6 +454,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
         appBar: _buildAppBar(currentIndex),
         drawer: _buildDrawer(),
         endDrawer: _buildEndDrawer(),
+        key: _scaffoldKey,
         body: <Widget>[
           MovesScreen(
             moveBox: widget.moveBox,
@@ -455,7 +469,15 @@ class _FortetudeAppState extends State<FortetudeApp> {
             lineBox: widget.lineBox,
             sandBox: widget.sandBox,
           ),
-          LineScreen(lineBox:  widget.lineBox,),
+          LineScreen(
+            lineBox: widget.lineBox,
+            scaffoldKey: _scaffoldKey,
+            onLineSelected: (line) {
+              setState(() {
+                _selectedLine = line;
+              });
+                _scaffoldKey.currentState?.openDrawer();
+            }),
         ][currentIndex],
         bottomNavigationBar: FTNavigationBar(
           currentIndex: currentIndex,
