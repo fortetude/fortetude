@@ -3,9 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:math';
 
 import '../../lines/models/line.dart';
 import '../../moves/models/move.dart';
+import '../widgets/confirm_dialog.dart';
 
 class SandboxScreen extends StatefulWidget {
   final Box<Move> moveBox;
@@ -73,7 +75,10 @@ class _SandboxScreenState extends State<SandboxScreen> {
                 color: Colors.deepPurple,
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Icon(Icons.swap_horizontal_circle_sharp, color: Colors.white),
+                child: Icon(
+                  Icons.swap_horizontal_circle_sharp,
+                  color: Colors.white,
+                ),
               ),
               secondaryBackground: Container(
                 color: Colors.red,
@@ -190,14 +195,92 @@ Future<void> reorderSandbox(
 }
 
 class SandBoxAutoDrawer extends StatelessWidget {
-  const SandBoxAutoDrawer({super.key});
+  final Box<Move> moveBox;
+  final Box<int> sandBox;
+  const SandBoxAutoDrawer({
+    super.key,
+    required this.moveBox,
+    required this.sandBox,
+  });
 
   @override
   Widget build(BuildContext context) {
+    int moveCount = 10;
     return Drawer(
       surfaceTintColor: Colors.blue,
       width: 240,
-      child: Center(child: Text("Work In Progress!")),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Generate Sandbox Line",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+
+            // Slider to pick number of moves
+            Text("Number of moves: $moveCount"),
+            StatefulBuilder(
+              builder: (context, setState) {
+                return Slider(
+                  value: moveCount.toDouble(),
+                  min: 0,
+                  max: 50,
+                  divisions: 50,
+                  label: moveCount.toString(),
+                  onChanged: (value) {
+                    setState(() => moveCount = value.toInt());
+                  },
+                );
+              },
+            ),
+
+            const SizedBox(height: 16),
+
+            // Generate button
+            Center(
+              child: ElevatedButton(
+                onPressed: () async {
+
+                  final rand = Random();
+
+                  // Generate a line (List<int>) with random moves
+                  List<int> generatedLine = List.generate(
+                    moveCount,
+                    (index) => rand.nextInt(moveBox.length), // replace with random or logic
+                  );
+
+                  // Overwrite sandbox
+                  bool? result;
+                  // overwrite dialog
+                  if (sandBox.length > 0) {
+                    result = await confirmOverwriteSandbox(
+                      context: context,
+                      length: sandBox.length,
+                    );
+                  }
+
+                  if (sandBox.length > 0 && result == null) {
+                    return; // nop
+                    // overwrite
+                  } else if (sandBox.length > 0 && result == true) {
+                    await sandBox.clear();
+                  }
+
+                  // add moves
+                  await sandBox.addAll(generatedLine);
+
+                  // Optional: close drawer
+                  Navigator.of(context).pop();
+                },
+                child: const Text("Generate Line"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

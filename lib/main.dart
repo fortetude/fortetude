@@ -252,7 +252,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
           onSortChanged: (v) => setState(() => sortType = v),
         );
       case 1:
-        return SandBoxAutoDrawer();
+        return SandBoxAutoDrawer(moveBox: widget.moveBox, sandBox: widget.sandBox);
       default:
         return LineDrawer(selectedLine: _selectedLine, moveBox: widget.moveBox);
     }
