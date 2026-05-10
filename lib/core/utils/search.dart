@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../features/lines/models/line.dart';
 import '../../features/moves/models/move.dart';
 
-class MoveSearchDelegate extends SearchDelegate<int?> {
-  final Box<Move> moveBox;
+class FTSearchDelegate extends SearchDelegate<int?> {
+  final Box<dynamic> box;
 
-  MoveSearchDelegate({required this.moveBox});
+  FTSearchDelegate({required this.box});
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -24,7 +25,7 @@ class MoveSearchDelegate extends SearchDelegate<int?> {
 
   @override
   Widget buildResults(BuildContext context) {
-    final results = moveBox.values.where((move) {
+    final results = box.values.where((move) {
       return move.name.toLowerCase().contains(query.toLowerCase());
     }).toList();
 
@@ -32,12 +33,19 @@ class MoveSearchDelegate extends SearchDelegate<int?> {
       itemCount: results.length,
 
       itemBuilder: (context, index) {
-        final move = results[index];
+        final item = results[index];
 
         return ListTile(
-          title: Text(move.name),
+          title: Text(item.name),
+          trailing: (item.runtimeType == Line && item.pinned) ?
+            Icon(Icons.push_pin_sharp, color: Colors.grey.shade400): null
+          ,
           onTap: () {
-            close(context, move.moveId);
+            if (item.runtimeType == Move) {
+              close(context, item.moveId);
+            } else {
+              close(context, item.key);
+            }
           },
         );
       },

@@ -286,7 +286,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             onPressed: () async {
               final moveId = await showSearch<int?>(
                 context: context,
-                delegate: MoveSearchDelegate(moveBox: widget.moveBox),
+                delegate: FTSearchDelegate(box: widget.moveBox),
               );
 
               if (moveId != null) {
@@ -336,13 +336,45 @@ class _FortetudeAppState extends State<FortetudeApp> {
             tooltip: "Open Saved Line",
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
-            onPressed: () {
+            onPressed: () async {
               // showSearch
+              final lineKey = await showSearch<int?>(
+                context: context,
+                delegate: FTSearchDelegate(box: widget.lineBox),
+              );
 
-              // show overwrite dialog
+              if (lineKey != null) {
+                final line = widget.lineBox.get(lineKey);
 
-              // append
-              // overwrite
+                bool? result;
+                // overwrite dialog
+                if (sandBox.length > 0) {
+                  result = await confirmOverwriteSandbox(
+                    context: context,
+                    length: sandBox.length,
+                  );
+                }
+
+                if (sandBox.length > 0 && result == null) {
+                  return; // nop
+                  // overwrite
+                } else if (sandBox.length > 0 && result == true) {
+                  await sandBox.clear();
+                }
+
+                // add moves
+                await sandBox.addAll(line!.moveList);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added ${line?.name} to Sandbox!'),
+                      duration: Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
             },
           ),
           Icons.more_vert => _popUpMenu(moveBox, lineBox, sandBox, context),
@@ -380,7 +412,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             tooltip: "Import Line to Sandbox",
             padding: EdgeInsets.zero,
             visualDensity: VisualDensity.compact,
-            onPressed: () {
+            onPressed: () async {
               if (_tappedLine == null) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -391,6 +423,35 @@ class _FortetudeAppState extends State<FortetudeApp> {
                 );
               } else {
                 // show confirmation dialog
+
+                bool? result;
+                // overwrite dialog
+                if (sandBox.length > 0) {
+                  result = await confirmOverwriteSandbox(
+                    context: context,
+                    length: sandBox.length,
+                  );
+                }
+
+                if (sandBox.length > 0 && result == null) {
+                  return; // nop
+                  // overwrite
+                } else if (sandBox.length > 0 && result == true) {
+                  await sandBox.clear();
+                }
+
+                // add moves
+                await sandBox.addAll(_tappedLine!.moveList);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added ${_tappedLine?.name} to Sandbox!'),
+                      duration: Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
 
                 // send it
               }
@@ -438,10 +499,11 @@ class _FortetudeAppState extends State<FortetudeApp> {
             // Call your share function here
             break;
           case 'clear':
-            if (await confirmEmptySandbox(
-              context: incomingContext,
-              length: sandBox.length,
-            )) {
+            if (sandBox.length > 0 &&
+                await confirmEmptySandbox(
+                  context: incomingContext,
+                  length: sandBox.length,
+                )) {
               await sandBox.clear();
             }
             break;
