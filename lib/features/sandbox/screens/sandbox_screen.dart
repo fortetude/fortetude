@@ -97,13 +97,17 @@ class _SandboxScreenState extends State<SandboxScreen> {
                     bottom: BorderSide(color: Colors.black26, width: 1),
                     left: BorderSide(
                       color: moveItem.direction.notRight()
-                          ? moveItem.competency.color()
+                          ? (moveItem.fresh
+                                ? Colors.grey.shade800
+                                : moveItem.competency.color())
                           : Colors.transparent,
                       width: 5,
                     ),
                     right: BorderSide(
                       color: moveItem.direction.notLeft()
-                          ? moveItem.competency.color()
+                          ? (moveItem.fresh
+                                ? Colors.grey.shade800
+                                : moveItem.competency.color())
                           : Colors.transparent,
                       width: 5,
                     ),
@@ -243,13 +247,14 @@ class SandBoxAutoDrawer extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () async {
-
                   final rand = Random();
 
                   // Generate a line (List<int>) with random moves
                   List<int> generatedLine = List.generate(
                     moveCount,
-                    (index) => rand.nextInt(moveBox.length), // replace with random or logic
+                    (index) => rand.nextInt(
+                      moveBox.length,
+                    ), // replace with random or logic
                   );
 
                   // Overwrite sandbox
@@ -340,7 +345,10 @@ class SandboxInfoDrawer extends StatelessWidget {
                   ? LaunchMode.platformDefault
                   : LaunchMode.externalApplication;
 
-              launchUrl(Uri.parse('https://example.com'), mode: mode);
+              launchUrl(
+                Uri.parse('https://fortetude.github.io/pages/user-guide/'),
+                mode: mode,
+              );
             },
           ),
           Divider(height: 0),

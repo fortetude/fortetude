@@ -65,6 +65,7 @@ Map<String, Category> moveEntries = {
   "Reverse Underbar (R)": Category.bar,
   "Bar Kip": Category.bar,
   "Bar Muscle Up": Category.bar,
+  "Toe Shoot": Category.bar,
 };
 
 // Vaults

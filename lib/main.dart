@@ -1,25 +1,24 @@
 import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart' hide Category;
 import 'package:flutter/material.dart';
-import 'package:fortetude/features/lines/models/line_adapter.dart';
-//import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'dart:math';
 
-import 'core/utils/search.dart';
-import 'features/lines/widgets/line_name.dart';
 import 'navbar.dart';
+import 'core/utils/search.dart';
 import 'core/utils/string.dart';
 
 import 'features/moves/models/move.dart';
-import 'features/lines/models/line.dart';
 import 'features/moves/models/move_items.dart';
 import 'features/moves/services/move_adapter.dart';
 import 'features/moves/screens/moves_screen.dart';
-import 'features/lines/screens/lines_screen.dart';
 import 'features/sandbox/screens/sandbox_screen.dart';
+import 'features/sandbox/screens/share_receive_screen.dart';
 import 'features/sandbox/widgets/confirm_dialog.dart';
+import 'features/lines/models/line.dart';
+import 'features/lines/widgets/line_name.dart';
+import 'features/lines/screens/lines_screen.dart';
+import 'package:fortetude/features/lines/models/line_adapter.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -252,7 +251,10 @@ class _FortetudeAppState extends State<FortetudeApp> {
           onSortChanged: (v) => setState(() => sortType = v),
         );
       case 1:
-        return SandBoxAutoDrawer(moveBox: widget.moveBox, sandBox: widget.sandBox);
+        return SandBoxAutoDrawer(
+          moveBox: widget.moveBox,
+          sandBox: widget.sandBox,
+        );
       default:
         return LineDrawer(selectedLine: _selectedLine, moveBox: widget.moveBox);
     }
@@ -495,8 +497,44 @@ class _FortetudeAppState extends State<FortetudeApp> {
             );
             break;
           case 'share':
-            print('Share selected');
-            // Call your share function here
+            final scanResult = await Navigator.of(incomingContext).push(
+              MaterialPageRoute(
+                builder: (_) => ShareReceiveScreen(sandBox: widget.sandBox),
+                fullscreenDialog: true,
+              ),
+            );
+
+            // List<int> returned successfully
+            if (scanResult != null) {
+              bool? result;
+              // overwrite dialog
+              if (sandBox.length > 0) {
+                result = await confirmOverwriteSandbox(
+                  context: incomingContext,
+                  length: sandBox.length,
+                );
+              }
+
+              if (sandBox.length > 0 && result == null) {
+                return; // nop
+                // overwrite
+              } else if (sandBox.length > 0 && result == true) {
+                await sandBox.clear();
+              }
+
+              // add moves
+              await sandBox.addAll(scanResult);
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Added ${_tappedLine?.name} to Sandbox!'),
+                    duration: Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            }
             break;
           case 'clear':
             if (sandBox.length > 0 &&
@@ -535,7 +573,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             children: [
               Icon(Icons.offline_share, color: Colors.black),
               SizedBox(width: 8),
-              Text('Share'),
+              Text('Transfer'),
             ],
           ),
         ),
@@ -634,7 +672,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
     final values = sandbox.values.toList();
 
     // Shuffle the values
-    values.shuffle(Random());
+    values.shuffle(math.Random());
 
     // Map shuffled values back to original keys
     final newMap = {for (int i = 0; i < keys.length; i++) keys[i]: values[i]};

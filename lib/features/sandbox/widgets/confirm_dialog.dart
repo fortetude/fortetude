@@ -52,7 +52,7 @@ Future<bool?> confirmOverwriteSandbox({required BuildContext context, required i
           Expanded(child: const Text("Overwrite Sandbox?")),
         ]
       ),
-      content: Text("Would you like to overwrite the sandbox ($length items) with new moves from the line?"),
+      content: Text("Would you like to overwrite the sandbox ($length items) with new moves?"),
       actions: [
 
         TextButton(
@@ -63,15 +63,6 @@ Future<bool?> confirmOverwriteSandbox({required BuildContext context, required i
         FilledButton(
           onPressed: () {
             Navigator.pop(context, true);
-            /*
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Imported Line into Sandbox!"),
-                  duration: Duration(seconds: 1),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            */
             },
           child: const Text('Overwrite'),
         ),
