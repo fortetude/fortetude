@@ -1,3 +1,3 @@
 # fortetude
 
-A new Flutter project.
+A parkour Flutter project.
