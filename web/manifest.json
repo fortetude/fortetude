@@ -1,11 +1,11 @@
 {
     "name": "fortetude",
     "short_name": "fortetude",
-    "start_url": ".",
+    "start_url": "/fortetude/",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "An offline tool that helps self-assess your movements and build adaptive lines, while encouraging growth into a well-rounded practitioner.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
