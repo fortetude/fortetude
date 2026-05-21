@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -27,12 +28,13 @@
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
   <title>fortetude</title>
   <link rel="manifest" href="manifest.json">
 
 </head>
+
 <body>
   <!--
     You can customize the "flutter_bootstrap.js" script.
@@ -43,5 +45,26 @@
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
   <script src="flutter_bootstrap.js" async></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-44CSVHJ1JC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-44CSVHJ1JC');
+  </script>
+
+  <!-- PWA install tracking -->
+  <script>
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+    // Only track first-time standalone launch
+    if (isStandalone && !localStorage.getItem('pwa_installed')) {
+      gtag('event', 'pwa_installed', { method: 'standalone_mode' });
+      localStorage.setItem('pwa_installed', 'true');
+    }
+  </script>
 </body>
+
 </html>
