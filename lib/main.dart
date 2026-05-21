@@ -314,6 +314,18 @@ class _FortetudeAppState extends State<FortetudeApp> {
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               // prompt for name
+              if(widget.sandBox.isEmpty) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Nothing to save, sandbox empty!'),
+                      duration: Duration(seconds: 1),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+                return;
+              }
               final name = await promptLineName(context, widget.lineBox, null);
               if (name != null) {
                 Line newLine = Line(
