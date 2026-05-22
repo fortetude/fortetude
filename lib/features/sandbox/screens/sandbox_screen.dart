@@ -323,7 +323,7 @@ class SandboxInfoDrawer extends StatelessWidget {
                         child: Transform.translate(
                           offset: const Offset(0, 6),
                           child: Text(
-                            ' v0.0.1',
+                            ' v1.0.0',
                             style: TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ),

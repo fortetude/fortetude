@@ -29,7 +29,7 @@ enum Category {
 }
 
 enum Competency {
-  unonciousCompetence('UC'),
+  unconciousCompetence('UC'),
   conciousCompetence('CC'),
   conciousIncompetence('CI'),
   unconciousIncompetence('UI');
@@ -39,7 +39,7 @@ enum Competency {
 
   // switch color based on competency level
   Color color() => switch (this) {
-    Competency.unonciousCompetence => Color.fromARGB(200, 59, 167, 255),
+    Competency.unconciousCompetence => Color.fromARGB(200, 59, 167, 255),
     Competency.conciousCompetence => Color.fromARGB(240, 100, 255, 86),
     Competency.conciousIncompetence => Color.fromRGBO(255, 255, 24, 0.902),
     Competency.unconciousIncompetence => Color.fromARGB(209, 253, 80, 80),
@@ -47,7 +47,7 @@ enum Competency {
 
   @override
   String toString() => switch (this) {
-    Competency.unonciousCompetence => "Unconcious Competence",
+    Competency.unconciousCompetence => "Unconcious Competence",
     Competency.conciousCompetence => "Concious Competence",
     Competency.conciousIncompetence => "Concious Incompetence",
     Competency.unconciousIncompetence => "Unconcious Incompetence",
@@ -143,7 +143,8 @@ class Move extends HiveObject {
     return value.length > 1000 ? value.substring(0, 1000) : value;
   }
 
-  String get cleanName => name.replaceFirst(" (L)", "").replaceFirst(" (R)", "");
+  String get cleanName =>
+      name.replaceFirst(" (L)", "").replaceFirst(" (R)", "");
 
   double controlWidth() {
     return (control / 10).clamp(0.0, 1.0);
@@ -180,13 +181,67 @@ class Move extends HiveObject {
       lastModified: DateTime.now(), // update modified date
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'moveId': moveId,
+      'name': name,
+
+      // Store enums as strings for stability
+      'direction': direction.name,
+      'category': category.name,
+      'competency': competency.name,
+
+      'control': control,
+
+      // ISO8601 is portable and human-readable
+      'lastModified': lastModified.toIso8601String(),
+
+      // Store enum sets as string arrays
+      'areas': areas.map((e) => e.name).toList(),
+
+      'fresh': fresh,
+
+      'notes': notes,
+    };
+  }
+
+  factory Move.fromJson(Map<String, dynamic> json) {
+    return Move(
+      moveId: json['moveId'] as int,
+
+      name: json['name'] as String,
+
+      direction: Direction.values.firstWhere(
+        (e) => e.name == json['direction'],
+      ),
+
+      category: Category.values.firstWhere((e) => e.name == json['category']),
+
+      competency: Competency.values.firstWhere(
+        (e) => e.name == json['competency'],
+      ),
+
+      control: json['control'] as int,
+
+      lastModified: DateTime.parse(json['lastModified'] as String),
+
+      areas: (json['areas'] as List)
+          .map((e) => AreaOfConcern.values.firstWhere((a) => a.name == e))
+          .toSet(),
+
+      fresh: json['fresh'] as bool,
+
+      notes: json['notes'] as String?,
+    );
+  }
 }
 
 extension MoveRating on Move {
   int get overallRating {
     // Competency points
     int competencyPoints = switch (competency) {
-      Competency.unonciousCompetence => 70,
+      Competency.unconciousCompetence => 70,
       Competency.conciousCompetence => 50,
       Competency.conciousIncompetence => 30,
       Competency.unconciousIncompetence => 10,
@@ -197,11 +252,11 @@ extension MoveRating on Move {
       0 => 0,
       1 => -3,
       2 => -5,
-      _ => -7, 
+      _ => -7,
     };
 
     // Control points (just add control directly)
-    int controlPoints = control; 
+    int controlPoints = control;
 
     return competencyPoints + areaPoints + controlPoints;
   }

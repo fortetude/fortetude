@@ -97,10 +97,10 @@ class _MoveDetailScreenState extends State<MoveDetailScreen> {
           isExpanded: false,
           items: [
             DropdownMenuItem(
-              value: Competency.unonciousCompetence,
+              value: Competency.unconciousCompetence,
               child: Text(
-                Competency.unonciousCompetence.toString(),
-                style: TextStyle(color: Competency.unonciousCompetence.color()),
+                Competency.unconciousCompetence.toString(),
+                style: TextStyle(color: Competency.unconciousCompetence.color()),
               ),
             ),
             DropdownMenuItem(
