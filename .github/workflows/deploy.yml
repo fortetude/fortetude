@@ -34,7 +34,7 @@ jobs:
         run: flutter pub get
 
       - name: Build Flutter Web
-        run: flutter build web --base-href /fortetude/
+        run: flutter build web --base-href /fortetude/ --dart-define=GOOGLE_FORMS_URL=${{ secrets.GOOGLE_FORMS_URL }}
 
       - name: Add SPA fallback
         run: cp build/web/index.html build/web/404.html

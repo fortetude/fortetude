@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:math';
 
+import '../../../core/utils/appconfig.dart';
 import '../../lines/models/line.dart';
 import '../../moves/models/move.dart';
 import '../widgets/confirm_dialog.dart';
@@ -362,10 +363,11 @@ class SandboxInfoDrawer extends StatelessWidget {
                   ? LaunchMode.platformDefault
                   : LaunchMode.externalApplication;
 
-              launchUrl(Uri.parse('https://example.com'), mode: mode);
+              launchUrl(Uri.parse('https://buymeacoffee.com/kawingho'), mode: mode);
             },
           ),
           Divider(height: 0),
+          /*
           // Light/Dark toggle
           ListTile(
             leading: Icon(Icons.light_mode_outlined), // settings_display
@@ -378,6 +380,21 @@ class SandboxInfoDrawer extends StatelessWidget {
               Icons.dark_mode_outlined,
             ), // settings_display_rounded
             onTap: () {},
+          ),
+          Divider(height: 0),
+          */
+          // Feedback!
+          ListTile(
+            leading: Icon(Icons.chat_bubble_rounded),
+            title: Text("Suggest Improvements"),
+            subtitle: Text("Share some feedback for the app"),
+            onTap: () {
+              final mode = kIsWeb
+                  ? LaunchMode.platformDefault
+                  : LaunchMode.externalApplication;
+
+              launchUrl(Uri.parse(AppConfig.googleFormsUrl), mode: mode);
+            },
           ),
           Divider(height: 0),
         ],
