@@ -6,6 +6,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'navbar.dart';
 import 'core/utils/search.dart';
 import 'core/utils/string.dart';
+import 'core/utils/backup/backup.dart';
 
 import 'features/moves/models/move.dart';
 import 'features/moves/models/move_items.dart';
@@ -18,7 +19,6 @@ import 'features/lines/models/line.dart';
 import 'features/lines/widgets/line_name.dart';
 import 'features/lines/screens/lines_screen.dart';
 import 'package:fortetude/features/lines/models/line_adapter.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -314,7 +314,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
             visualDensity: VisualDensity.compact,
             onPressed: () async {
               // prompt for name
-              if(widget.sandBox.isEmpty) {
+              if (widget.sandBox.isEmpty) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -382,7 +382,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Added ${line?.name} to Sandbox!'),
+                      content: Text('Added ${line.name} to Sandbox!'),
                       duration: Duration(seconds: 1),
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -416,7 +416,7 @@ class _FortetudeAppState extends State<FortetudeApp> {
                 // send it
                 if (result != null) {
                   _tappedLine!.name = result;
-                  _tappedLine!.save();
+                  await _tappedLine!.save();
                 }
               }
             },
@@ -566,9 +566,45 @@ class _FortetudeAppState extends State<FortetudeApp> {
           case 'info':
             Scaffold.of(incomingContext).openEndDrawer();
             break;
+          // importing data into moves and lines
+          case 'import':
+            // show safety dialog in prod
+            if (!kDebugMode) {
+              await showDialog(
+                context: incomingContext,
+                builder: (context) => AlertDialog(
+                  title: const Text("Overwrite All Data?"),
+                  content: Text("This action will erase all existing Move and Line data."),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Ok'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
+            performImport(moveBox, lineBox, incomingContext);
+            break;
+          // export moves and lines into file
+          case 'export':
+            performExport(moveBox, lineBox, incomingContext);
+            break;
         }
       },
       itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'challenge',
+          child: Row(
+            children: [
+              Icon(Icons.flag, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Challenge Ideas'),
+            ],
+          ),
+        ),
         PopupMenuItem(
           value: 'shuffle',
           child: Row(
@@ -599,13 +635,24 @@ class _FortetudeAppState extends State<FortetudeApp> {
             ],
           ),
         ),
+
         PopupMenuItem(
-          value: 'challenge',
+          value: 'import',
           child: Row(
             children: [
-              Icon(Icons.flag, color: Colors.black),
+              Icon(Icons.file_download_outlined, color: Colors.black),
               SizedBox(width: 8),
-              Text('Challenge Ideas'),
+              Text('Import Data'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'export',
+          child: Row(
+            children: [
+              Icon(Icons.file_upload_outlined, color: Colors.black),
+              SizedBox(width: 8),
+              Text('Export Data'),
             ],
           ),
         ),

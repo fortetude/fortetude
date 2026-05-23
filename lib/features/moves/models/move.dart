@@ -52,6 +52,15 @@ enum Competency {
     Competency.conciousIncompetence => "Concious Incompetence",
     Competency.unconciousIncompetence => "Unconcious Incompetence",
   };
+
+  static Competency fromShort(String value) {
+    return Competency.values.firstWhere(
+      (e) => e.short == value,
+      orElse: () {
+        throw FormatException('Invalid Competency value: $value');
+      },
+    );
+  }
 }
 
 enum AreaOfConcern {
@@ -67,6 +76,15 @@ enum AreaOfConcern {
     AreaOfConcern.mental => Icons.self_improvement_rounded,
     AreaOfConcern.technique => Icons.psychology_rounded,
   };
+
+  static AreaOfConcern fromShort(String value) {
+    return AreaOfConcern.values.firstWhere(
+      (e) => e.short == value,
+      orElse: () {
+        throw FormatException('Invalid AreaOfConcern value: $value');
+      },
+    );
+  }
 }
 
 extension AreasIcon on AreaOfConcern {
@@ -188,9 +206,9 @@ class Move extends HiveObject {
       'name': name,
 
       // Store enums as strings for stability
-      'direction': direction.name,
-      'category': category.name,
-      'competency': competency.name,
+      'direction': direction.short,
+      'category': category.short,
+      'competency': competency.short,
 
       'control': control,
 
@@ -198,7 +216,7 @@ class Move extends HiveObject {
       'lastModified': lastModified.toIso8601String(),
 
       // Store enum sets as string arrays
-      'areas': areas.map((e) => e.name).toList(),
+      'areas': areas.map((e) => e.short).toList(),
 
       'fresh': fresh,
 
@@ -207,6 +225,46 @@ class Move extends HiveObject {
   }
 
   factory Move.fromJson(Map<String, dynamic> json) {
+    if (json['moveId'] is! int) {
+      throw FormatException('Move.moveId must be an int');
+    }
+
+    if (json['name'] is! String) {
+      throw FormatException('Move.name must be a String');
+    }
+
+    if (json['direction'] is! String) {
+      throw FormatException('Move.direction must be a String');
+    }
+
+    if (json['category'] is! String) {
+      throw FormatException('Move.category must be a String');
+    }
+
+    if (json['competency'] is! String) {
+      throw FormatException('Move.competency must be a String');
+    }
+
+    if (json['control'] is! int) {
+      throw FormatException('Move.control must be an int');
+    }
+
+    if (json['lastModified'] is! String) {
+      throw FormatException('Move.lastModified must be a String');
+    }
+
+    if (json['areas'] is! List) {
+      throw FormatException('Move.areas must be a List');
+    }
+
+    if (json['fresh'] is! bool) {
+      throw FormatException('Move.fresh must be a bool');
+    }
+
+    if (json['notes'] != null && json['notes'] is! String) {
+      throw FormatException('Move.notes must be a String or null');
+    }
+
     return Move(
       moveId: json['moveId'] as int,
 

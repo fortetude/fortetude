@@ -124,7 +124,7 @@ class _LineScreenState extends State<LineScreen> {
                       // toggle pinned value
                       if (direction == DismissDirection.startToEnd) {
                         line.pinned = !line.pinned;
-                        line.save();
+                        await line.save();
                         return false;
                       }
 
