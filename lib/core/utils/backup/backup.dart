@@ -168,6 +168,7 @@ Future<void> uploadBackup(Box<Move> moveBox, Box<Line> lineBox) async {
       updateMove.control = m.control;
       updateMove.areas = m.areas;
       updateMove.notes = m.notes;
+      updateMove.fresh = false; // if importing, no longer fresh
       await updateMove.save();
     }
   }
