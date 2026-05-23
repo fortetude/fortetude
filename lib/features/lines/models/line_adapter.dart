@@ -1,9 +1,7 @@
 import 'package:hive_flutter/hive_flutter.dart';
-
 import 'line.dart';
 
 class LineAdapter extends TypeAdapter<Line> {
-
   @override
   final int typeId = 1;
 
@@ -12,8 +10,8 @@ class LineAdapter extends TypeAdapter<Line> {
 
     final name = reader.readString();
     final moveList = (reader.readList()).cast<int>();
-    final created = reader.read() as DateTime;
-    final modified = reader.read();
+    final created = DateTime.fromMillisecondsSinceEpoch(reader.readInt());
+    final modified = DateTime.fromMillisecondsSinceEpoch(reader.readInt());
     final pinned = reader.readBool();
 
     final line = Line(
@@ -33,8 +31,8 @@ class LineAdapter extends TypeAdapter<Line> {
 
     writer.writeString(obj.name);
     writer.writeList(obj.moveList);
-    writer.write(obj.created);
-    writer.write(obj.modified);
+    writer.writeInt(obj.created.millisecondsSinceEpoch);
+    writer.writeInt(obj.modified!.millisecondsSinceEpoch);
     writer.writeBool(obj.pinned);
   }
 }
